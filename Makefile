@@ -3,9 +3,15 @@ CXX=g++
 CFLAGS=-c -Wall
 CXXFLAGS=-c -Wall
 
-LDFLAGS=-lmicrohttpd
+UNAME := $(shell uname)
+ifeq ($(UNAME), Linux)
+LDFLAGS=-lmicrohttpd -lpthread
 INCLUDES=-Isrc/include
-
+endif
+ifeq ($(UNAME), Darwin)
+LDFLAGS=-L/usr/local/lib -lmicrohttpd
+INCLUDES=-I/usr/local/include
+endif
 
 CSOURCES=src/WebServer.c
 CXXSOURCES= 

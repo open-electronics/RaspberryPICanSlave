@@ -376,11 +376,11 @@ serveSnapShotXML (const void *cls,
 	      		  struct Session *session,
 	      		  struct MHD_Connection *connection)
 {
-  int ret;
+  int ret = 0x00;
   //char *reply;
-  struct MHD_Response *response;
+  //struct MHD_Response *response;
 
-  const char *pCmd = MHD_lookup_connection_value (connection, MHD_GET_ARGUMENT_KIND, "Cmd");
+  //const char *pCmd = MHD_lookup_connection_value (connection, MHD_GET_ARGUMENT_KIND, "Cmd");
 //  printf("Cmd = %s\n", pCmd);
 
   // TODO: parse the pCmd string and serve the XML accordingly
@@ -388,10 +388,10 @@ serveSnapShotXML (const void *cls,
   // 
     
   /* return static form */
-  response = MHD_create_response_from_buffer (strlen (pString),
-					      (void *) pString,
-					      MHD_RESPMEM_PERSISTENT);				  
-  if (NULL == response)
+  //response = MHD_create_response_from_buffer (strlen (pString),
+  //				      (void *) pString,
+  //					      MHD_RESPMEM_PERSISTENT);				  
+  /* if (NULL == response)
     return MHD_NO;
   add_session_cookie (session, response);
   MHD_add_response_header (response,
@@ -400,7 +400,7 @@ serveSnapShotXML (const void *cls,
   ret = MHD_queue_response (connection,
 			    MHD_HTTP_OK,
 			    response);
-  MHD_destroy_response (response);
+  MHD_destroy_response (response);*/
   return ret;
 }
 
@@ -423,9 +423,9 @@ serveMasterNameXML (const void *cls,
   // The XML is filled up by the CommandDispatcher using a static string object.
   // Since this is a .c file, we cannot use class objects here, so we basically
   // extract a char point from it.
-  const char *pString;   
+  const char *pString = NULL;
   // Dispatch the command
-  CommandDispatcher(&pString, pCmd);
+  //CommandDispatcher(&pString, pCmd);
   //strcpy(pString, MASTER_NAME);
   //sprintf(pString, reply, String);
   //free(reply);
