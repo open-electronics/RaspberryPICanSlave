@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<script>
+	
+	function getXmlHttpRequestObject() {
+		 if (window.XMLHttpRequest) {
+			 return new XMLHttpRequest();
+		 } else if (window.ActiveXObject) {
+			 return new ActiveXObject("Microsoft.XMLHTTP");
+		 } else {
+			 alert("Your Browser does not support AJAX!\nIt's about time to upgrade don't you think?");
+		 }
+		 
+	 }
+ 
+//XmlHttpRequest object
+var req = getXmlHttpRequestObject();
+// Main interval to poll HAL status from server
+var SnapShotInterval = setInterval(getRequestRefresh, 1000);
+
+var Seconds = 0;
+var HandlerCounter = 0;
+//setInterval(IncreaseFreqCount, 1000);
+
+function IncreaseFreqCount()
+{
+	Seconds = Seconds + 1;
+	Num = HandlerCounter / Seconds;
+	txt = HandlerCounter.toFixed(1) + "/" + Seconds.toFixed(1) + "=" + Num.toFixed(1);
+	document.getElementById("freq").innerHTML=txt;
+}
+
+function getRequestRefresh()
+ {
+	 getRequest('/data/SnapShot.xml', 'Refresh', handleResponse);
+ }
+
+function getRequestRecognize()
+ {
+	 //clearInterval(SnapShotInterval);
+	 getRequest('/data/SnapShot.xml', 'Recog', handleResponse2);
+	 return false;
+ }
+
+function getRequest(resource, command, handleResponse)
+ {
+	// Stop SnapShot interval until this request will have been served
+	//clearInterval(SnapShotInterval);
+ 	//resource = '/data/MasterName.xml?Cmd=Recog';
+	// handle the case where a querystring is not detected
+	String = resource + "?" + 'Cmd=' + command + "&" + 'ms=' + new Date().getTime();
+	//alert(String);
+	
+ 	if (req.readyState == 4 || req.readyState == 0) {
+		 req.open("GET", String, true);
+	 	 req.onreadystatechange = handleResponse;
+	 	 req.send(null);
+	 	 return false;
+ 	}
+ }
+
+function handleResponse()
+ {
+	if (req.readyState == 4) 
+	{
+		parseState(req.responseXML);
+		HandlerCounter = HandlerCounter + 1;
+	}
+} 
+
+function handleResponse2()
+ {
+	if (req.readyState == 4) 
+	{
+		parseState(req.responseXML);
+		// Restart SnapShot interval
+		//SnapShotInterval = setInterval(getRequestRefresh, 150);
+	}
+} 
+
+function parseState(xmlDoc)
+{
+	if(xmlDoc == null)
+		return;
+	// Fill number of readers
+	x=xmlDoc.getElementsByTagName("SnapShot");
+	Rds=(x[0].getElementsByTagName("Rds")[0].childNodes[0].nodeValue);
+	txt="Number or readers: " + Rds;
+	document.getElementById("Rds").innerHTML=txt;
+	// Fill the main table
+	x=xmlDoc.getElementsByTagName("Tag");
+	txt="<table border='1'><tr><th>Type</th><th>Reader</th><th>Id</th><th>Log Time</th></tr>";
+	// Check if the master list is empty
+	if ( x.length == 0 )
+	{
+		txt=txt + "<tr>";
+		txt=txt + "<td>" + "NO Tags Logged Yet!!!" + "</td>";
+		txt=txt + "</tr>";
+	}
+	else
+	{
+		// Build the Masters table
+		for (i=0;i<x.length;i++)
+		{
+			txt=txt + "<tr>";
+			// Type Master
+			txt=txt + "<td>" + "Tag" + "</td>";
+			txt=txt + "<td>" + x[i].getAttribute('R') + "</td>";
+			txt=txt + "<td>" + x[i].getAttribute('Id') + "</td>";
+			txt=txt + "<td>" + x[i].getAttribute('T') + "</td>";
+		}
+	}
+    txt=txt + "</table>";
+    document.getElementById('MasterTable').innerHTML=txt;
+	// Fill the number of frames
+	x=xmlDoc.getElementsByTagName("SnapShot");
+	fps=(x[0].getElementsByTagName("fps")[0].childNodes[0].nodeValue);
+	txt="Frames: " + fps;
+	document.getElementById("fps").innerHTML=txt;
+}
+
+</script>
+
+</head>
+<body>
+
+<button onclick="getRequestRecognize();">Recognize</button>
+<div id='Rds'></div><br>
+<div id='MasterTable'></div><br>
+<div id='fps'></div><br>
+First name: <input type="text" name="FirstName" value="Mickey"><br>
+Last name: <input type="text" name="LastName" value="Mouse"><br>
+
+</body>
+</html>

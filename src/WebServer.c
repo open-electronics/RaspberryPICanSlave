@@ -404,51 +404,6 @@ serveSnapShotXML (const void *cls,
   return ret;
 }
 
-int GetBufferName(unsigned char *buf);
-
-
-static int
-serveMasterNameXML (const void *cls,
-	      		  const char *mime,
-	      		  struct Session *session,
-	      		  struct MHD_Connection *connection)
-{
-  int ret;
-  //char *reply;
-  struct MHD_Response *response;
-   
-  const char *pCmd = MHD_lookup_connection_value (connection, MHD_GET_ARGUMENT_KIND, "Cmd");
-  printf("Cmd = %s\n", pCmd);
-  
-  // The XML is filled up by the CommandDispatcher using a static string object.
-  // Since this is a .c file, we cannot use class objects here, so we basically
-  // extract a char point from it.
-  const char *pString = NULL;
-  // Dispatch the command
-  //CommandDispatcher(&pString, pCmd);
-  //strcpy(pString, MASTER_NAME);
-  //sprintf(pString, reply, String);
-  //free(reply);
-  
-  fprintf(stdout, "%s\n", pString);
-  
-  /* return static form */
-  response = MHD_create_response_from_buffer (strlen (pString),
-					      (void *) pString,
-					      MHD_RESPMEM_PERSISTENT);				  
-  if (NULL == response)
-    return MHD_NO;
-  add_session_cookie (session, response);
-  MHD_add_response_header (response,
-			   MHD_HTTP_HEADER_CONTENT_ENCODING,
-			   mime);
-  ret = MHD_queue_response (connection,
-			    MHD_HTTP_OK,
-			    response);
-  MHD_destroy_response (response);
-  return ret;
-}
-
 /**
  * Handler that adds the 'v1' and 'v2' values to the given HTML code.
  *
@@ -533,9 +488,7 @@ not_found_page (const void *cls,
 static struct Page pages[] =
   {
 	{ "/data/SnapShot.xml", "text/xml", &serveSnapShotXML, NULL},
-	{ "/data/MasterName.xml", "text/xml", &serveMasterNameXML, NULL},
     { "/", "text/html",  &ServeRoot, NULL },
-    { "/HAL1", "text/html",  &ServeMainPage, NULL },
 	{ "/2", "text/html", &fill_v1_v2_form, NULL },
     { "/S", "text/html", &serve_simple_form, SUBMIT_PAGE },
     { "/F", "text/html", &serve_simple_form, LAST_PAGE },
