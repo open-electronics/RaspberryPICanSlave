@@ -1,5 +1,5 @@
 /*
-     This file is part RaspberryPICANSlave
+     This file is part of RaspberryPICANSlave
      (C) Riccardo Ventrella 2017
      This library is free software; you can redistribute it and/or
      modify it under the terms of the GNU Lesser General Public
@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <vector>
 #include <string>
+#include <CfgLoader.h>
 
 using namespace std;
 

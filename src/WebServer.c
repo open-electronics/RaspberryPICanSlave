@@ -1,5 +1,5 @@
 /*
-     This file is part RaspberryPICANSlave
+     This file is part of RaspberryPICANSlave
      (C) Riccardo Ventrella 2017
      This library is free software; you can redistribute it and/or
      modify it under the terms of the GNU Lesser General Public
@@ -21,6 +21,7 @@
 #include <errno.h>
 #include <time.h>
 #include <microhttpd.h>
+#include <CfgLoader.h>
 
 
 //#define TRACE
@@ -822,8 +823,8 @@ main (int argc, char *const *argv)
   else
 	  Port = atoi (argv[1]);
  	
-  // TODO: put here the initialization f()
-  // TODO: read the config file etc
+  // Read the CANSlave.cfg configuration file
+  LoadCfgFile("./data/CANSlave.cfg");
   
   /* initialize PRNG */
   srand ((unsigned int) time (NULL));

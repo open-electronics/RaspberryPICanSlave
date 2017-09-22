@@ -9,9 +9,9 @@ LDFLAGS=-lmicrohttpd -lpthread
 INCLUDES=-Isrc/include
 endif
 ifeq ($(UNAME), Darwin)
-CXXFLAGS +=  -std=c++11 -stdlib=libc++
+CXXFLAGS +=  -std=c++11  -stdlib=libc++
 LDFLAGS=-L/usr/local/lib -lmicrohttpd
-INCLUDES=-I/usr/local/include
+INCLUDES=-Isrc/include -I/usr/local/include
 endif
 
 CSOURCES=src/WebServer.c
