@@ -23,6 +23,9 @@
 
 using namespace std;
 
+// Uncomment this to DUMP verbosely debug stuff on stdout
+//#define DUMP
+
 // Cfg var entry names
 #define VAR_CTRL_ID       "CTRL_ID"
 #define VAR_EXPIRE_TS     "EXPIRE_TS"
@@ -95,12 +98,15 @@ static int GetSection(const string Line)
    size_t Found = Line.find_first_of("[");
    if (Found == std::string::npos)
       return 0;
-   SubString = Line.substr(Found);
+   SubString = Line.substr(Found+1);
    // Find the ending "]" and force the substring here
-   SubString.find_first_of("[");
+   Found = SubString.find_first_of("]");
    if (Found == std::string::npos)
       return 0;
-   SubString[Found] = 0x00;
+   SubString.resize(Found);
+#ifdef DUMP
+   printf("Found Section: %s\n", SubString.c_str());
+#endif   
    // Strip this substring, to get a bare version of it
    Strip(SubString);
    // Nothing to do if the line became empty
@@ -125,10 +131,13 @@ static bool GetVarValuePair(string& VarName, int& Value, const string& Line)
    Strip(ValueString);
    // Trim the Line string to the variable one
    VarName = Line;
-   VarName[Found] = 0x00;
+   VarName.resize(Found);
    // Always work with an uppercase var name string
    ToUpper(VarName);
    Strip(VarName);
+#ifdef DUMP
+   printf("Var = %s, Value = %s\n", VarName.c_str(), ValueString.c_str());
+#endif
    // Get the number from the ValueString. If the string contains a "x", we assume it's in hex format.
    Found = ValueString.find_first_of("x");
    if (Found != std::string::npos)
@@ -148,7 +157,12 @@ void LoadCfgFile(const char CfgFilePath[])
    ifstream CfgFile(CfgFilePath);
    // Test the file has been opened or fail instead
    if (!CfgFile)
+   {
+#ifdef DUMP
+	   printf("Cfg not found!!!");
+#endif	  
       return;
+   }
 
    string Line, VarName;
    int    SectionNumber, Value;
@@ -156,19 +170,22 @@ void LoadCfgFile(const char CfgFilePath[])
    // Parse the file line by line
    while (getline(CfgFile, Line))
    {
-      // Strip the line leading/trailing spaces
-      Strip(Line);
       // Nothing to do if the line became empty
       if (Line.empty())
          continue;
       // Remove the comments, i.e. all the substring after a possible ";"
       size_t Found = Line.find_first_of(";");
       if (Found != std::string::npos)
-         // Remove the found substring ending the string in that place
-         Line[Found] = 0x00;
+         // Shrink the string removing the comment
+         Line.resize(Found);
+      // Strip the line leading/trailing spaces
+      Strip(Line);
       // Nothing to do if the line became empty
       if (Line.empty())
          continue;
+#ifdef DUMP
+	  printf("Line: <%s>\n", Line.c_str());
+#endif
       // Check this line is a section, returnin its embedded hex number, eventually
       SectionNumber = GetSection(Line);
 	  if(SectionNumber)
@@ -202,4 +219,15 @@ void LoadCfgFile(const char CfgFilePath[])
          }
       }
    }
+#ifdef DUMP
+   if (sSlaves.empty())
+	   printf("\nWARNING: No slaves in the cfg!!!\n");
+   else
+   {
+	   printf("\nnSlaves = %lu\n", sSlaves.size());
+	   // Loop on slaves and dump them
+	   for (auto it : sSlaves)
+		   printf("ID = 0x%8x, CTRL_ID = 0x%8x, Expire_TS = %6dms\n", it.GetID(), it.GetCTRL_ID(), it.GetExpireTS());   	
+   }
+#endif
 }
