@@ -17,55 +17,19 @@
 */
 #include <fstream>
 #include <algorithm>
-#include <vector>
 #include <string>
 #include <CfgLoader.h>
+#include <Slaves.h>
+
 
 using namespace std;
 
 // Uncomment this to DUMP verbosely debug stuff on stdout
-//#define DUMP
+#define DUMP
 
 // Cfg var entry names
 #define VAR_CTRL_ID       "CTRL_ID"
 #define VAR_EXPIRE_TS     "EXPIRE_TS"
-
-
-// Expire TimeStamp default in msec
-#define Expire_TS_Default  3000
-
-
-// This represents a CAN Slave entry (TODO: 2B moved to a separate cpp)
-class CSlave
-{
-private:
-   int      m_ID;                 // The State CAN message ID, served by the slave periodically. Read by the CFG (section) or inited as unmapped slave, eventually.
-   int      m_CTRL_ID;            // The Control CAN message ID, i.e. the one to be used to sent relays command to the slave. Read by the CFG.
-   int      m_Relays;             // Payload of the CAN message: lowest 4 bits represents the 4 relays ON/OFF states
-   int      m_TimeStamp;          // Last message TimeStamp arrival
-   int      m_ExpireTimeStamp;    // This is the threshold in msec to be added to the last status message arrival. After it, the Slave is considered "Out of date". Read by the CFG.
-
-public:
-   // Ctor
-   CSlave (void) : m_ID(0), m_CTRL_ID(0), m_Relays(0), m_TimeStamp(0), m_ExpireTimeStamp(Expire_TS_Default) {}
-
-   // Setters
-   void  SetID          (const int ID)              { m_ID = ID; };
-   void  SetCTRL_ID     (const int CTRL_ID)         { m_CTRL_ID = CTRL_ID; }
-   void  SetRelays      (const int Relays)          { m_Relays = Relays; }
-   void  SetTS          (const int TimeStamp)       { m_TimeStamp = TimeStamp; }
-   void  SetExpireTS(const int ExpireTimeStamp)     { m_ExpireTimeStamp = ExpireTimeStamp; }
-
-   // Getters
-   int   GetID          (void) const                { return m_ID; }
-   int   GetCTRL_ID     (void) const                { return m_CTRL_ID; }
-   int   GetRelays      (void) const                { return m_Relays; }
-   int   GetTTS         (void) const                { return m_TimeStamp; }
-   int   GetExpireTS    (void) const                { return m_ExpireTimeStamp; }
-};
-
-// This represents the current CAN Slave repository (TODO: 2B moved to a separate cpp)
-vector<CSlave> sSlaves;
 
 
 
@@ -189,45 +153,28 @@ void LoadCfgFile(const char CfgFilePath[])
       // Check this line is a section, returnin its embedded hex number, eventually
       SectionNumber = GetSection(Line);
 	  if(SectionNumber)
-      {
-         // Append a new empty Slave entry and modify it below from its back reference.
-         // This approach saves memory and speed, since avoids to allocate a dedicated element
-         // on the stack, doing a useless copy operator onto it.
-         sSlaves.emplace_back();
-         CSlave& Slave = sSlaves.back();
-         Slave.SetID(SectionNumber);
-      }
+		  Slave_AddID(SectionNumber);
       else
       {
          // Here it comes a "variable = value" pair. Get this couple and update current Slave, if any.
          // If the line is not found to be a valid var + value pair, or it there's not any valid Slave
          // let's simply ignore this line, skipping to the next one.
-         if (!sSlaves.empty())
+		 if(!SlavesAreEmpty())
          {
             // Parse the current line and retrieve its var + value pair, before appending it
             if (GetVarValuePair(VarName, Value, Line))
             {
-               // Get the current Slave as the last one
-               CSlave& Slave = sSlaves.back();
                // Update its entry just read from the cfg.
                // We have to switch across the VarName to match the proper Slave entry
                if (VarName == VAR_CTRL_ID)
-                  Slave.SetCTRL_ID(Value);
+				   Slave_Add_CTRL_ID_ToLastID(Value);
                else if (VarName == VAR_EXPIRE_TS)
-                  Slave.SetExpireTS(Value);
+				   Slave_Add_ExpireTS_ToLastID(Value);
             }
          }
       }
    }
 #ifdef DUMP
-   if (sSlaves.empty())
-	   printf("\nWARNING: No slaves in the cfg!!!\n");
-   else
-   {
-	   printf("\nnSlaves = %lu\n", sSlaves.size());
-	   // Loop on slaves and dump them
-	   for (auto it : sSlaves)
-		   printf("ID = 0x%8x, CTRL_ID = 0x%8x, Expire_TS = %6dms\n", it.GetID(), it.GetCTRL_ID(), it.GetExpireTS());   	
-   }
+	Slave_DUMPSlavesForDebug();
 #endif
 }
