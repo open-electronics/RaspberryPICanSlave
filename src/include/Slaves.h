@@ -18,13 +18,27 @@
 #ifndef __SLAVES_H__
 #define __SLAVES_H__
 
+// Decoration to let C++ code be used from within plain C modules
+#ifdef __cplusplus
+extern "C" {
+#endif
+	
 
-bool SlavesAreEmpty					(void);
+void SlavesInit						(void);
+void SlavesQuit						(void);
+int	 SlavesAreEmpty					(void);
 void Slave_AddID					(const int ID);
-void Slave_Add_CTRL_ID_ToLastID		(const int CTRL_ID);
-void Slave_Add_ExpireTS_ToLastID	(const int ExpireTS);
+void Slave_Update_CTRL_ID			(const int CTRL_ID, const int ID);
+void Slave_Update_Relays			(const int Relays, const int ID);
+void Slave_Update_TimeStamp			(const int TimeStamp, const int ID);
+void Slave_Update_ExpireTS			(const int ExpireTS, const int ID);
 void Slave_DUMPSlavesForDebug		(void);
 
+
+// Decoration to let C++ code be used from within plain C modules
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif

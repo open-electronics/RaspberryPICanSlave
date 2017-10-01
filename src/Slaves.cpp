@@ -15,8 +15,12 @@
      License along with this library; if not, write to the Free Software
      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#include <vector>
+#include <map>
+#include <pthread.h>
 #include <Slaves.h>
+
+// Mutex which protects SlavesMap access from multiple threads (actually the main one and the CANRx one)
+static pthread_mutex_t sMutex;
 
 using namespace std;
 
@@ -25,10 +29,9 @@ using namespace std;
 #define Expire_TS_Default  3000
 
 
-class CSlave
+class CSlaveValue
 {
 private:
-   int      m_ID;                 // The State CAN message ID, served by the slave periodically. Read by the CFG (section) or inited as unmapped slave, eventually.
    int      m_CTRL_ID;            // The Control CAN message ID, i.e. the one to be used to sent relays command to the slave. Read by the CFG.
    int      m_Relays;             // Payload of the CAN message: lowest 4 bits represents the 4 relays ON/OFF states
    int      m_TimeStamp;          // Last message TimeStamp arrival
@@ -36,80 +39,130 @@ private:
 
 public:
    // Ctor
-   CSlave (void) : m_ID(0), m_CTRL_ID(0), m_Relays(0), m_TimeStamp(0), m_ExpireTimeStamp(Expire_TS_Default) {}
+   CSlaveValue(void) : m_CTRL_ID(0), m_Relays(0), m_TimeStamp(0), m_ExpireTimeStamp(Expire_TS_Default) {}
 
    // Setters
-   void  SetID          (const int ID)              { m_ID = ID; };
    void  SetCTRL_ID     (const int CTRL_ID)         { m_CTRL_ID = CTRL_ID; }
    void  SetRelays      (const int Relays)          { m_Relays = Relays; }
    void  SetTS          (const int TimeStamp)       { m_TimeStamp = TimeStamp; }
    void  SetExpireTS(const int ExpireTimeStamp)     { m_ExpireTimeStamp = ExpireTimeStamp; }
 
    // Getters
-   int   GetID          (void) const                { return m_ID; }
    int   GetCTRL_ID     (void) const                { return m_CTRL_ID; }
    int   GetRelays      (void) const                { return m_Relays; }
    int   GetTTS         (void) const                { return m_TimeStamp; }
    int   GetExpireTS    (void) const                { return m_ExpireTimeStamp; }
 };
 
-// This represents the current CAN Slave repository (TODO: 2B moved to a separate cpp)
-static vector<CSlave> sSlaves;
 
+typedef map<int, CSlaveValue> SlavesMapType;
+typedef SlavesMapType::iterator SlavesIterator;
 
-bool SlavesAreEmpty(void)
+// Slaves map repository, indexed by the CAN ID as int
+static SlavesMapType SlavesMap;
+
+// Initialization stuff
+void SlavesInit(void)
 {
-	return sSlaves.empty();
+   pthread_mutex_init(&sMutex, NULL);
+}
+
+void SlavesQuit(void)
+{
+   pthread_mutex_destroy(&sMutex);
+}
+
+int SlavesAreEmpty(void)
+{
+   pthread_mutex_lock(&sMutex);
+   bool rc = SlavesMap.empty();
+   pthread_mutex_unlock(&sMutex);
+   return rc;
 }
 
 void Slave_AddID(const int ID)
 {
-    // Append a new empty Slave entry and modify it below from its back reference.
-    // This approach saves memory and speed, since avoids to allocate a dedicated element
-    // on the stack, doing a useless copy operator onto it.
-    sSlaves.emplace_back();
-    CSlave& Slave = sSlaves.back();
-    Slave.SetID(ID);
+   pthread_mutex_lock(&sMutex);
+   // Emplace it with a defaulted slave (if not present)
+   SlavesMap.emplace(ID, CSlaveValue());
+  pthread_mutex_unlock(&sMutex); 
 }
 
-void Slave_Add_CTRL_ID_ToLastID(const int CTRL_ID)
+void Slave_Update_CTRL_ID(const int CTRL_ID, const int ID)
 {
-	// Nothing to do if there are no slaves
-	if(sSlaves.empty())
-		return;
-    // Get the current Slave as the last one
-    CSlave& Slave = sSlaves.back();
-	Slave.SetCTRL_ID(CTRL_ID);
+   pthread_mutex_lock(&sMutex);
+   // The Slave repo is not empty so far. Let's find a given ID match
+   SlavesIterator it = SlavesMap.find(ID);
+   if (it != SlavesMap.end())
+      it->second.SetCTRL_ID(CTRL_ID);
+   else
+   {
+      CSlaveValue Slave;
+      Slave.SetCTRL_ID(CTRL_ID);
+      SlavesMap.emplace(ID, Slave);
+   }
+   pthread_mutex_unlock(&sMutex);
 }
 
-void Slave_Add_ExpireTS_ToLastID(const int ExpireTS)
+void Slave_Update_Relays(const int Relays, const int ID)
 {
-	// Nothing to do if there are no slaves
-	if(sSlaves.empty())
-		return;
-    // Get the current Slave as the last one
-    CSlave& Slave = sSlaves.back();
-	Slave.SetExpireTS(ExpireTS);
+   pthread_mutex_lock(&sMutex);
+   // The Slave repo is not empty so far. Let's find a given ID match
+   SlavesIterator it = SlavesMap.find(ID);
+   if (it != SlavesMap.end())
+      it->second.SetRelays(Relays);
+   else
+   {
+      CSlaveValue Slave;
+      Slave.SetRelays(Relays);
+      SlavesMap.emplace(ID, Slave);
+   }
+   pthread_mutex_unlock(&sMutex);
+}
+
+void Slave_Update_TimeStamp(const int TimeStamp, const int ID)
+{
+   pthread_mutex_lock(&sMutex);
+   // The Slave repo is not empty so far. Let's find a given ID match
+   SlavesIterator it = SlavesMap.find(ID);
+   if (it != SlavesMap.end())
+      it->second.SetTS(TimeStamp);
+   else
+   {
+      CSlaveValue Slave;
+      Slave.SetTS(TimeStamp);
+      SlavesMap.emplace(ID, Slave);
+   }
+   pthread_mutex_unlock(&sMutex);
+}
+
+void Slave_Update_ExpireTS(const int ExpireTS, const int ID)
+{
+   pthread_mutex_lock(&sMutex);
+   // The Slave repo is not empty so far. Let's find a given ID match
+   SlavesIterator it = SlavesMap.find(ID);
+   if (it != SlavesMap.end())
+      it->second.SetExpireTS(ExpireTS);
+   else
+   {
+      CSlaveValue Slave;
+      Slave.SetExpireTS(ExpireTS);
+      SlavesMap.emplace(ID, Slave);
+   }
+   pthread_mutex_unlock(&sMutex);
 }
 
 void Slave_DUMPSlavesForDebug(void)
 {
-    if (sSlaves.empty())
+   pthread_mutex_lock(&sMutex);
+    if (SlavesMap.empty())
  	   printf("\nWARNING: No slaves in the cfg!!!\n");
     else
     {
- 	   printf("\nnSlaves = %lu\n", sSlaves.size());
+ 	   printf("\nnSlaves = %zu\n", SlavesMap.size());
  	   // Loop on slaves and dump them
- 	   for (auto it : sSlaves)
- 		   printf("ID = 0x%8x, CTRL_ID = 0x%8x, Expire_TS = %6dms\n", it.GetID(), it.GetCTRL_ID(), it.GetExpireTS());   	
+ 	   for (auto it : SlavesMap)
+ 		   printf("ID = 0x%8x, CTRL_ID = 0x%8x, Expire_TS = %6dms\n", it.first, it.second.GetCTRL_ID(), it.second.GetExpireTS());   	
     }	
+    pthread_mutex_unlock(&sMutex);
 }
-
-
-
-
-
-
-
-
-

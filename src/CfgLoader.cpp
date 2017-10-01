@@ -25,7 +25,7 @@
 using namespace std;
 
 // Uncomment this to DUMP verbosely debug stuff on stdout
-//#define DUMP
+#define DUMP
 
 // Cfg var entry names
 #define VAR_CTRL_ID       "CTRL_ID"
@@ -119,6 +119,8 @@ static bool GetVarValuePair(string& VarName, int& Value, const string& Line)
 void LoadCfgFile(const char CfgFilePath[])
 {
    ifstream CfgFile(CfgFilePath);
+   int		CurrSlave = 0;
+   
    // Test the file has been opened or fail instead
    if (!CfgFile)
    {
@@ -130,7 +132,7 @@ void LoadCfgFile(const char CfgFilePath[])
 
    string Line, VarName;
    int    SectionNumber, Value;
-
+   
    // Parse the file line by line
    while (getline(CfgFile, Line))
    {
@@ -153,13 +155,16 @@ void LoadCfgFile(const char CfgFilePath[])
       // Check this line is a section, returnin its embedded hex number, eventually
       SectionNumber = GetSection(Line);
 	  if(SectionNumber)
+	  {
 		  Slave_AddID(SectionNumber);
+		  CurrSlave = SectionNumber;
+	  }
       else
       {
          // Here it comes a "variable = value" pair. Get this couple and update current Slave, if any.
          // If the line is not found to be a valid var + value pair, or it there's not any valid Slave
          // let's simply ignore this line, skipping to the next one.
-		 if(!SlavesAreEmpty())
+		 if(CurrSlave && !SlavesAreEmpty())
          {
             // Parse the current line and retrieve its var + value pair, before appending it
             if (GetVarValuePair(VarName, Value, Line))
@@ -167,9 +172,9 @@ void LoadCfgFile(const char CfgFilePath[])
                // Update its entry just read from the cfg.
                // We have to switch across the VarName to match the proper Slave entry
                if (VarName == VAR_CTRL_ID)
-				   Slave_Add_CTRL_ID_ToLastID(Value);
+				   Slave_Update_CTRL_ID(Value, CurrSlave);
                else if (VarName == VAR_EXPIRE_TS)
-				   Slave_Add_ExpireTS_ToLastID(Value);
+				   Slave_Update_ExpireTS(Value, CurrSlave);
             }
          }
       }

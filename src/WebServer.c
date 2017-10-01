@@ -21,6 +21,7 @@
 #include <errno.h>
 #include <time.h>
 #include <microhttpd.h>
+#include <Slaves.h>
 #include <CfgLoader.h>
 
 
@@ -823,6 +824,8 @@ main (int argc, char *const *argv)
   else
 	  Port = atoi (argv[1]);
  	
+  // Init the Slaves repo
+  SlavesInit();
   // Read the CANSlave.cfg configuration file
   LoadCfgFile("./data/CANSlave.cfg");
   
@@ -859,6 +862,8 @@ main (int argc, char *const *argv)
       MHD_run (d);
     }
   MHD_stop_daemon (d);
+  
+  SlavesQuit();
 
   return 0;
 #endif
