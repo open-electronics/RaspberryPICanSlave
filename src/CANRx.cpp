@@ -15,33 +15,30 @@
      License along with this library; if not, write to the Free Software
      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#ifndef __SLAVES_H__
-#define __SLAVES_H__
+#include <stdio.h>
+#include <pthread.h>
+#include <CANRx.h>
+#include <Slaves.h>
 
-// Uncomment this to DUMP verbosely debug stuff on stdout
-#define DUMP
 
-// Decoration to let C++ code be used from within plain C modules
-#ifdef __cplusplus
-extern "C" {
+// CANRx thread callback
+static void* CANRxThreadCbk(void *pPtr)
+{
+#ifdef DUMP
+	printf("CANRx listener thread successfully started!!!\n");
 #endif
 	
-
-void SlavesInit						(void);
-void SlavesQuit						(void);
-int	 SlavesAreEmpty					(void);
-void Slave_AddID					(const int ID);
-void Slave_Update_CTRL_ID			(const int CTRL_ID, const int ID);
-void Slave_Update_Relays			(const int Relays, const int ID);
-void Slave_Update_TimeStamp			(const int TimeStamp, const int ID);
-void Slave_Update_ExpireTS			(const int ExpireTS, const int ID);
-void Slave_DUMPSlavesForDebug		(void);
-
-
-// Decoration to let C++ code be used from within plain C modules
-#ifdef __cplusplus
+	
+	
+	return nullptr;
 }
-#endif
 
-
-#endif
+// Start a thread which listen to CAN Rx frames. All rx reads are blocking
+// in order to keep thread in sleep mode until a CAN message is reiceived.
+int StartCANRxThread(void)
+{
+	pthread_t Thread;
+	
+	// Gives current hid_device* as thread cbk parameter
+	return pthread_create(&Thread, NULL, CANRxThreadCbk, nullptr);
+}

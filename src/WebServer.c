@@ -23,6 +23,7 @@
 #include <microhttpd.h>
 #include <Slaves.h>
 #include <CfgLoader.h>
+#include <CANRx.h>
 
 
 //#define TRACE
@@ -828,6 +829,8 @@ main (int argc, char *const *argv)
   SlavesInit();
   // Read the CANSlave.cfg configuration file
   LoadCfgFile("./data/CANSlave.cfg");
+  // Start the CAN listener thread
+  StartCANRxThread();
   
   /* initialize PRNG */
   srand ((unsigned int) time (NULL));

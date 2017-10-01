@@ -15,11 +15,8 @@
      License along with this library; if not, write to the Free Software
      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#ifndef __SLAVES_H__
-#define __SLAVES_H__
-
-// Uncomment this to DUMP verbosely debug stuff on stdout
-#define DUMP
+#ifndef __CANRX_H__
+#define __CANRX_H__
 
 // Decoration to let C++ code be used from within plain C modules
 #ifdef __cplusplus
@@ -27,17 +24,9 @@ extern "C" {
 #endif
 	
 
-void SlavesInit						(void);
-void SlavesQuit						(void);
-int	 SlavesAreEmpty					(void);
-void Slave_AddID					(const int ID);
-void Slave_Update_CTRL_ID			(const int CTRL_ID, const int ID);
-void Slave_Update_Relays			(const int Relays, const int ID);
-void Slave_Update_TimeStamp			(const int TimeStamp, const int ID);
-void Slave_Update_ExpireTS			(const int ExpireTS, const int ID);
-void Slave_DUMPSlavesForDebug		(void);
-
-
+int StartCANRxThread(void);
+	
+	
 // Decoration to let C++ code be used from within plain C modules
 #ifdef __cplusplus
 }
