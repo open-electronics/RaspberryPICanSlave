@@ -1,7 +1,7 @@
 CC=gcc
 CXX=g++
 CFLAGS=-c -Wall
-CXXFLAGS=-c -Wall
+CXXFLAGS=-c -Wall -std=c++11
 
 UNAME := $(shell uname)
 ifeq ($(UNAME), Linux)
@@ -9,7 +9,7 @@ LDFLAGS=-lmicrohttpd -lpthread
 INCLUDES=-Isrc/include
 endif
 ifeq ($(UNAME), Darwin)
-CXXFLAGS +=  -std=c++11  -stdlib=libc++
+CXXFLAGS +=  -std=c++11
 LDFLAGS=-L/usr/local/lib -lmicrohttpd
 INCLUDES=-Isrc/include -I/usr/local/include
 endif
