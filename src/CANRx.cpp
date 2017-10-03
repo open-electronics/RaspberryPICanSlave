@@ -16,6 +16,8 @@
      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 #include <pthread.h>
 #include <CANRx.h>
 #include <Slaves.h>
@@ -77,7 +79,7 @@ static void* CANRxThreadCbk(void *pPtr)
        // Use a blocking select without any timeout. This will ensure this
        // thread will be put to sleep until a valid CAN message will arrive
        FD_ZERO(&readset);
-       FD_SET(socket_fd, &readset);
+       FD_SET(sd, &readset);
        // Blocking select on the unique socket descriptor
        if (select(sd + 1, &readset, nullptr, nullptr, nullptr) >= 0)
        {
