@@ -9,7 +9,6 @@ LDFLAGS=-lmicrohttpd -lpthread
 INCLUDES=-Isrc/include
 endif
 ifeq ($(UNAME), Darwin)
-CXXFLAGS +=  -std=c++11
 LDFLAGS=-L/usr/local/lib -lmicrohttpd
 INCLUDES=-Isrc/include -I/usr/local/include
 endif
