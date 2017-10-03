@@ -24,8 +24,6 @@
 
 using namespace std;
 
-// Uncomment this to DUMP verbosely debug stuff on stdout
-//#define DUMP
 
 // Cfg var entry names
 #define VAR_CTRL_ID       "CTRL_ID"

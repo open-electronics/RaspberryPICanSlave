@@ -19,7 +19,7 @@
 #define __SLAVES_H__
 
 // Uncomment this to DUMP verbosely debug stuff on stdout
-#define DUMP
+//#define DUMP
 
 // Decoration to let C++ code be used from within plain C modules
 #ifdef __cplusplus
