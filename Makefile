@@ -1,5 +1,3 @@
-CC=gcc
-CXX=g++
 CFLAGS=-c -Wall
 CXXFLAGS=-c -Wall -std=c++11
 
