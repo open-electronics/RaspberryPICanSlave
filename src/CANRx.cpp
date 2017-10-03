@@ -39,39 +39,76 @@ static void* CANRxThreadCbk(void *pPtr)
 	printf("CANRx listener thread successfully started!!!\n");
 #endif
 	
-	struct ifreq ifr;
-	struct sockaddr_can addr;
-	struct can_frame frame; 
-	int s;
-	
-	memset(&ifr, 0x0, sizeof(ifr)); 
-	memset(&addr, 0x0, sizeof(addr)); 
-	memset(&frame, 0x0, sizeof(frame));
-	
-	/* open CAN_RAW socket */
-	s = socket(PF_CAN, SOCK_RAW, CAN_RAW);
-	/* convert interface sting "can0" into interface index */ 
-	strcpy(ifr.ifr_name, "can0");
-	ioctl(s, SIOCGIFINDEX, &ifr);
-	/* setup address for bind */
-	addr.can_family = PF_CAN;
-	addr.can_ifindex = ifr.ifr_ifindex; 
-	/* bind socket to the can0 interface */
-	bind(s, (struct sockaddr *)&addr, sizeof(addr));
-	
-	// Start a loop to listen to incoming CAN messages
-	// Loop forever until an error occured.
-	while (true)
-	{
-		
-		
-		
-	}
+    sockaddr_can addr;
+    can_frame    rxmsg;
+    fd_set       readset;
+    ifreq        ifr;
+    int          sd, ID;
+
+    const char *ifname = "vcan0";
+
+    memset(&ifr, 0x00, sizeof(ifr));
+    memset(&addr, 0x00, sizeof(addr));
+
+    // Open CAN_RAW socket
+    if ((sd = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) 
+    {
+       printf("Error while opening socket!!!\n");
+       return nullptr;
+    } 
+
+    // Convert the interface string "can0" into interface index
+    strcpy(ifr.ifr_name, ifname);
+    ioctl(sd, SIOCGIFINDEX, &ifr);
+    // Prepare the address for the binding
+    addr.can_family = PF_CAN;
+    addr.can_ifindex = ifr.ifr_ifindex;
+
+    // Bind the socket to the can0 interface
+    if (bind(sd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
+    {
+       perror("Error in socket binding!!!\n");
+       return nullptr;
+    }
+
+    // Here we are ready to enter the listening loop
+    while (true)
+    {
+       // Use a blocking select without any timeout. This will ensure this
+       // thread will be put to sleep until a valid CAN message will arrive
+       FD_ZERO(&readset);
+       FD_SET(socket_fd, &readset);
+       // Blocking select on the unique socket descriptor
+       if (select(sd + 1, &readset, nullptr, nullptr, nullptr) >= 0)
+       {
+          // A message is ready: check for the right socket descriptor
+          if (FD_ISSET(sd, &readset))
+          {
+             // Use a simple read on the descriptor
+             if (read(sd, &rxmsg, sizeof(rxmsg)))
+             {
+ #ifdef DUMP
+                printf("CAN_frame: ID = 0x%8x DLC = %d\n", rxmsg.can_id, can_dlc);
+ #endif
+                // Manage the message in Slaves repo
+                ID = rxmsg.can_id;
+                // Update the Slave matching this ID by the buffer, which contains mainly the relays status
+                // in the first 4 bytes. Actually we are assuming the number of relays (4) is < transferred
+                // bytes in the can_frame (should be) without doing further tests.
+                // The f() updates the msg arrival TimeStamp using the system one.
+                Slave_Update_Relays_And_TimeStamp(rxmsg.data, ID, (unsigned long)time(nullptr));
+             }
+          }
+       }
+ #ifdef DUMP
+       else
+          printf("Socket Select error!!!");
+ #endif
+    }
 	
 #else
 	printf("\nSocketCAN is supported on Linux only!!!\n\n");
 #endif	// __linux__
-
 		
 	return nullptr;
 }

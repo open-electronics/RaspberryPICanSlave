@@ -32,25 +32,28 @@ using namespace std;
 class CSlaveValue
 {
 private:
-   int      m_CTRL_ID;            // The Control CAN message ID, i.e. the one to be used to sent relays command to the slave. Read by the CFG.
-   int      m_Relays;             // Payload of the CAN message: lowest 4 bits represents the 4 relays ON/OFF states
-   int      m_TimeStamp;          // Last message TimeStamp arrival
-   int      m_ExpireTimeStamp;    // This is the threshold in msec to be added to the last status message arrival. After it, the Slave is considered "Out of date". Read by the CFG.
+   int            m_CTRL_ID;             // The Control CAN message ID, i.e. the one to be used to sent relays command to the slave. Read by the CFG.
+   byte           m_Relays[NUM_RELAYS];  // Payload of the CAN message: lowest 4 bits represents the 4 relays ON/OFF states
+   unsigned long  m_TimeStamp;           // Last message TimeStamp arrival. When 0, the slave is unmapped (i.e. no messages have never arrived)
+   int            m_ExpireTimeStamp;     // This is the threshold in msec to be added to the last status message arrival. After it, the Slave is considered "Out of date". Read by the CFG.
 
 public:
    // Ctor
-   CSlaveValue(void) : m_CTRL_ID(0), m_Relays(0), m_TimeStamp(0), m_ExpireTimeStamp(Expire_TS_Default) {}
+   CSlaveValue(void) : m_CTRL_ID(0), m_TimeStamp(0), m_ExpireTimeStamp(Expire_TS_Default)
+   {
+	   memset(m_Relays, 0x00, NUM_RELAYS);
+   }
 
    // Setters
-   void  SetCTRL_ID     (const int CTRL_ID)         { m_CTRL_ID = CTRL_ID; }
-   void  SetRelays      (const int Relays)          { m_Relays = Relays; }
-   void  SetTS          (const int TimeStamp)       { m_TimeStamp = TimeStamp; }
-   void  SetExpireTS(const int ExpireTimeStamp)     { m_ExpireTimeStamp = ExpireTimeStamp; }
+   void  SetCTRL_ID     (const int CTRL_ID)              { m_CTRL_ID = CTRL_ID; }
+   void  SetRelays      (const byte Relays[])            { memcpy(m_Relays, Relays, NUM_RELAYS); }
+   void  SetTS          (const unsigned long TimeStamp)  { m_TimeStamp = TimeStamp; }
+   void  SetExpireTS(const int ExpireTimeStamp)          { m_ExpireTimeStamp = ExpireTimeStamp; }
 
    // Getters
    int   GetCTRL_ID     (void) const                { return m_CTRL_ID; }
-   int   GetRelays      (void) const                { return m_Relays; }
-   int   GetTTS         (void) const                { return m_TimeStamp; }
+   const byte*  GetRelays(void) const                { return m_Relays; }
+   unsigned long GetTS   (void) const                 { return m_TimeStamp; }
    int   GetExpireTS    (void) const                { return m_ExpireTimeStamp; }
 };
 
@@ -104,32 +107,20 @@ void Slave_Update_CTRL_ID(const int CTRL_ID, const int ID)
    pthread_mutex_unlock(&sMutex);
 }
 
-void Slave_Update_Relays(const int Relays, const int ID)
+void Slave_Update_Relays_And_TimeStamp(const byte Relays[], const unsigned long TimeStamp, const int ID)
 {
    pthread_mutex_lock(&sMutex);
    // The Slave repo is not empty so far. Let's find a given ID match
    SlavesIterator it = SlavesMap.find(ID);
    if (it != SlavesMap.end())
+   {
       it->second.SetRelays(Relays);
+      it->second.SetTS(TimeStamp);
+   }
    else
    {
       CSlaveValue Slave;
       Slave.SetRelays(Relays);
-      SlavesMap.emplace(ID, Slave);
-   }
-   pthread_mutex_unlock(&sMutex);
-}
-
-void Slave_Update_TimeStamp(const int TimeStamp, const int ID)
-{
-   pthread_mutex_lock(&sMutex);
-   // The Slave repo is not empty so far. Let's find a given ID match
-   SlavesIterator it = SlavesMap.find(ID);
-   if (it != SlavesMap.end())
-      it->second.SetTS(TimeStamp);
-   else
-   {
-      CSlaveValue Slave;
       Slave.SetTS(TimeStamp);
       SlavesMap.emplace(ID, Slave);
    }
