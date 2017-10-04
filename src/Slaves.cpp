@@ -15,7 +15,12 @@
      License along with this library; if not, write to the Free Software
      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
+// Avoid problems with STL under OsX
+#ifdef __linux__
 #include <string.h>
+#else
+#include <string>
+#endif
 #include <map>
 #include <pthread.h>
 #include <Slaves.h>
