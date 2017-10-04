@@ -18,6 +18,9 @@
 #ifndef __SLAVES_H__
 #define __SLAVES_H__
 
+// Uncomment this to DUMP verbosely debug stuff on stdout
+//#define DUMP
+
 #define NUM_RELAYS         4
 
 typedef unsigned char   byte;
