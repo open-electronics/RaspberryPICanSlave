@@ -12,7 +12,7 @@ INCLUDES=-Isrc/include -I/usr/local/include
 endif
 
 CSOURCES=src/WebServer.c
-CXXSOURCES=src/CfgLoader.cpp src/Slaves.cpp src/CANRx.cpp
+CXXSOURCES=src/CfgLoader.cpp src/Slaves.cpp src/CANRx.cpp src/Commands.cpp
 OBJECTS=$(CXXSOURCES:.cpp=.o) $(CSOURCES:.c=.o)
 EXECUTABLE=CANSlave
 

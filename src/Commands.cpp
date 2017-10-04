@@ -15,35 +15,40 @@
      License along with this library; if not, write to the Free Software
      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#ifndef __SLAVES_H__
-#define __SLAVES_H__
+#include <pthread.h>
+#include <Commands.h>
+#include <Slaves.h>
 
-#define NUM_RELAYS         4
-
-typedef unsigned char   byte;
-
-// Decoration to let C++ code be used from within plain C modules
-#ifdef __cplusplus
-extern "C" {
-#endif
-	
-
-void SlavesInit						(void);
-void SlavesQuit						(void);
-int	 SlavesAreEmpty					(void);
-void Slave_AddID					(const int ID);
-void Slave_Update_CTRL_ID			(const int CTRL_ID, const int ID);
-void Slave_Update_Relays_And_TimeStamp			(const byte Relays[], const int TimeStamp, const int ID);
-void Slave_Update_TimeStamp			(const int TimeStamp, const int ID);
-void Slave_Update_ExpireTS			(const int ExpireTS, const int ID);
-void Slave_DUMPSlavesForDebug		(void);
-void GetSlavesXMLSnapShot        (const char **ppXMLSnapShot);
+// Mutex which protects the commands 
+static pthread_mutex_t sCmdMutex;
 
 
-// Decoration to let C++ code be used from within plain C modules
-#ifdef __cplusplus
+void CommandInit(void)
+{
+   pthread_mutex_init(&sCmdMutex, NULL);
 }
-#endif
 
 
-#endif
+void CommandQuit(void)
+{
+   pthread_mutex_destroy(&sCmdMutex);
+}
+
+
+void CommandDispatcher(const char **ppXMLSnapShot, const char Cmd[])
+{
+   // These mutex could be avoided, since we are using the microwebserver
+   // not in multithreaded mode, so each connection is served sequentially by a queue
+   // but we leave it here to support the webserver in multithreaded mode
+   pthread_mutex_lock(&sCmdMutex);
+
+   // Switch among commands:
+   //
+   // TODO
+   //
+
+   // Always returns a Slaves snapshot
+   GetSlavesXMLSnapShot(ppXMLSnapShot);
+
+   pthread_mutex_unlock(&sCmdMutex);
+}

@@ -15,7 +15,7 @@
      License along with this library; if not, write to the Free Software
      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#include <string.h>
+#include <string>
 #include <map>
 #include <pthread.h>
 #include <Slaves.h>
@@ -157,4 +157,45 @@ void Slave_DUMPSlavesForDebug(void)
  		   printf("ID = 0x%8x, CTRL_ID = 0x%8x, Expire_TS = %6dms\n", it.first, it.second.GetCTRL_ID(), it.second.GetExpireTS());   	
     }	
     pthread_mutex_unlock(&sMutex);
+}
+
+void GetSlavesXMLSnapShot(const char **ppXMLSnapShot)
+{
+   pthread_mutex_lock(&sMutex);
+
+   static string XMLSnapShot;
+   
+   XMLSnapShot = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+   XMLSnapShot += "<Slaves>";
+   // Loop on slaves
+   for (auto it : SlavesMap)
+   {
+      // Log the slaves with a valid TimeStamp ONLY (i.e. the ones for which at least one massage has arrived)
+      if (it.second.GetTS())
+      {
+         XMLSnapShot += "<Slave";
+         XMLSnapShot += " ID=\"";
+         XMLSnapShot += it.first;
+         XMLSnapShot += "\"";
+         XMLSnapShot += " CTRL_ID=\"";
+         XMLSnapShot += it.second.GetCTRL_ID();
+         XMLSnapShot += "\"";
+         // Log the TimeStamp when the last status message has arrived
+         XMLSnapShot += " TS=\"";
+         XMLSnapShot += it.second.GetTS();
+         XMLSnapShot += "\"";
+         XMLSnapShot += " EXP_TS=\"";
+         XMLSnapShot += it.second.GetExpireTS();
+         XMLSnapShot += "\"";
+         // Log current timestamp as well
+         XMLSnapShot += " NOW_TS=\"";
+         XMLSnapShot += time(nullptr);
+         XMLSnapShot += "\"";
+         XMLSnapShot += "</Slave>";
+      }
+   }
+   XMLSnapShot += "</Slaves>\n";
+   *ppXMLSnapShot = XMLSnapShot.c_str();
+
+   pthread_mutex_unlock(&sMutex);
 }

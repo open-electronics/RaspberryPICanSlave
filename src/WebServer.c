@@ -24,6 +24,7 @@
 #include <Slaves.h>
 #include <CfgLoader.h>
 #include <CANRx.h>
+#include <Commands.h>
 
 
 //#define TRACE
@@ -379,75 +380,34 @@ serveSnapShotXML (const void *cls,
 	      		  struct Session *session,
 	      		  struct MHD_Connection *connection)
 {
-  int ret = 0x00;
-  //char *reply;
-  //struct MHD_Response *response;
+   struct MHD_Response *response;
+   int    ret;
 
-  //const char *pCmd = MHD_lookup_connection_value (connection, MHD_GET_ARGUMENT_KIND, "Cmd");
-//  printf("Cmd = %s\n", pCmd);
+   const char *pCmd = MHD_lookup_connection_value(connection, MHD_GET_ARGUMENT_KIND, "Cmd");
+#ifdef DUMP
+   printf("Cmd = %s\n", pCmd);
+#endif
 
-  // TODO: parse the pCmd string and serve the XML accordingly
-  // TODO
-  // 
-    
-  /* return static form */
-  //response = MHD_create_response_from_buffer (strlen (pString),
-  //				      (void *) pString,
-  //					      MHD_RESPMEM_PERSISTENT);				  
-  /* if (NULL == response)
-    return MHD_NO;
-  add_session_cookie (session, response);
-  MHD_add_response_header (response,
-			   MHD_HTTP_HEADER_CONTENT_ENCODING,
-			   mime);
-  ret = MHD_queue_response (connection,
-			    MHD_HTTP_OK,
-			    response);
-  MHD_destroy_response (response);*/
-  return ret;
-}
+   // The XML is filled up by the CommandDispatcher using a static string object.
+   // Since this is a .c file, we cannot use class objects here, so we basically
+   // extract a char point from it.
+   const char *pString;
+   // Dispatch the command
+   CommandDispatcher(&pString, pCmd);
 
-/**
- * Handler that adds the 'v1' and 'v2' values to the given HTML code.
- *
- * @param cls unused
- * @param mime mime type to use
- * @param session session handle
- * @param connection connection to use
- */
-static int
-fill_v1_v2_form (const void *cls,
-		 const char *mime,
-		 struct Session *session,
-		 struct MHD_Connection *connection)
-{
-  int ret;
-  char *reply;
-  struct MHD_Response *response;
-
-  reply = malloc (strlen (SECOND_PAGE) + strlen (session->value_1) + strlen (session->value_2) + 1);
-  if (NULL == reply)
-    return MHD_NO;
-  snprintf (reply,
-	    strlen (SECOND_PAGE) + strlen (session->value_1) + strlen (session->value_2) + 1,
-	    SECOND_PAGE,
-	    session->value_1,
-            session->value_2);
-  /* return static form */
-  response = MHD_create_response_from_buffer (strlen (reply),
-					      (void *) reply,
-					      MHD_RESPMEM_MUST_FREE);
-  if (NULL == response)
-    return MHD_NO;
-  add_session_cookie (session, response);
-  MHD_add_response_header (response,
-			   MHD_HTTP_HEADER_CONTENT_ENCODING,
-			   mime);
-  ret = MHD_queue_response (connection,
-			    MHD_HTTP_OK,
-			    response);
-  MHD_destroy_response (response);
-  return ret;
+   /* return static form */
+   response = MHD_create_response_from_buffer(strlen(pString), (void *)pString, MHD_RESPMEM_PERSISTENT);
+   if (NULL == response)
+      return MHD_NO;
+   add_session_cookie(session, response);
+   MHD_add_response_header(response,
+      MHD_HTTP_HEADER_CONTENT_ENCODING,
+      mime);
+   ret = MHD_queue_response(connection,
+      MHD_HTTP_OK,
+      response);
+   MHD_destroy_response(response);
+   return ret;
 }
 
 
@@ -492,7 +452,6 @@ static struct Page pages[] =
   {
 	{ "/data/SnapShot.xml", "text/xml", &serveSnapShotXML, NULL},
     { "/", "text/html",  &ServeRoot, NULL },
-	{ "/2", "text/html", &fill_v1_v2_form, NULL },
     { "/S", "text/html", &serve_simple_form, SUBMIT_PAGE },
     { "/F", "text/html", &serve_simple_form, LAST_PAGE },
     { NULL, NULL, &not_found_page, NULL } /* 404 */
@@ -793,8 +752,7 @@ expire_sessions ()
  * Call with the port number as the only argument.
  * Never terminates (other than by signals, such as CTRL-C).
  */
-int
-main (int argc, char *const *argv)
+int main (int argc, char *const *argv)
 {
 #ifdef TEST
 	unsigned char buf[65];
@@ -831,6 +789,8 @@ main (int argc, char *const *argv)
   LoadCfgFile("./data/CANSlave.cfg");
   // Start the CAN listener thread
   StartCANRxThread();
+  // Init the commands stuff
+  CommandInit();
   
   /* initialize PRNG */
   srand ((unsigned int) time (NULL));
@@ -867,6 +827,7 @@ main (int argc, char *const *argv)
   MHD_stop_daemon (d);
   
   SlavesQuit();
+  CommandQuit();
 
   return 0;
 #endif

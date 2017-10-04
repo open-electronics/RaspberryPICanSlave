@@ -15,29 +15,18 @@
      License along with this library; if not, write to the Free Software
      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#ifndef __SLAVES_H__
-#define __SLAVES_H__
+#ifndef __COMMANDS_H__
+#define __COMMANDS_H__
 
-#define NUM_RELAYS         4
-
-typedef unsigned char   byte;
 
 // Decoration to let C++ code be used from within plain C modules
 #ifdef __cplusplus
 extern "C" {
 #endif
-	
 
-void SlavesInit						(void);
-void SlavesQuit						(void);
-int	 SlavesAreEmpty					(void);
-void Slave_AddID					(const int ID);
-void Slave_Update_CTRL_ID			(const int CTRL_ID, const int ID);
-void Slave_Update_Relays_And_TimeStamp			(const byte Relays[], const int TimeStamp, const int ID);
-void Slave_Update_TimeStamp			(const int TimeStamp, const int ID);
-void Slave_Update_ExpireTS			(const int ExpireTS, const int ID);
-void Slave_DUMPSlavesForDebug		(void);
-void GetSlavesXMLSnapShot        (const char **ppXMLSnapShot);
+   void CommandInit(void);
+   void CommandQuit(void);
+   void CommandDispatcher(const char **ppXMLSnapShot, const char Cmd[]);
 
 
 // Decoration to let C++ code be used from within plain C modules
