@@ -90,7 +90,7 @@ static void* CANRxThreadCbk(void *pPtr)
              if (read(sd, &rxmsg, sizeof(rxmsg)))
              {
  #ifdef DUMP
-                printf("CAN_frame: ID = 0x%8x DLC = %d\n", rxmsg.can_id, can_dlc);
+                printf("CAN_frame: ID = 0x%8x DLC = %d\n", rxmsg.can_id, rxmsg.can_dlc);
  #endif
                 // Manage the message in Slaves repo
                 ID = rxmsg.can_id;

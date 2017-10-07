@@ -19,7 +19,7 @@
 #define __SLAVES_H__
 
 // Uncomment this to DUMP verbosely debug stuff on stdout
-//#define DUMP
+#define DUMP
 
 #define NUM_RELAYS         4
 
