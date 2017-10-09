@@ -113,7 +113,7 @@ void Slave_Update_CTRL_ID(const int CTRL_ID, const int ID)
    pthread_mutex_unlock(&sMutex);
 }
 
-void Slave_Update_Relays_And_TimeStamp(const byte Relays[], const int ID, const int TimeStamp)
+void Slave_Update_Relays_And_TimeStamp(const byte Relays[], const int TimeStamp, const int ID)
 {
    pthread_mutex_lock(&sMutex);
    // The Slave repo is not empty so far. Let's find a given ID match
@@ -149,6 +149,24 @@ void Slave_Update_ExpireTS(const int ExpireTS, const int ID)
    pthread_mutex_unlock(&sMutex);
 }
 
+// Get the first Slave from the repo, if any, and returns its
+// CAN ID entry. If not present, simply returns 0.
+int SlaveGetFirstID(void)
+{
+	int ret = 0;
+    pthread_mutex_lock(&sMutex);
+    if (!SlavesMap.empty())
+	{
+		for (auto it : SlavesMap)
+		{
+			ret = it.first;
+			break;
+		}
+	}
+	pthread_mutex_unlock(&sMutex);
+	return ret;
+}
+
 void Slave_DUMPSlavesForDebug(void)
 {
    pthread_mutex_lock(&sMutex);
@@ -180,7 +198,7 @@ void GetSlavesXMLSnapShot(const char **ppXMLSnapShot)
       {
          XMLSnapShot += "<Slave";
          XMLSnapShot += " ID=\"";
-         XMLSnapShot += it.first;
+         XMLSnapShot += std::to_string(it.first);
          XMLSnapShot += "\"";
          XMLSnapShot += " CTRL_ID=\"";
          XMLSnapShot += it.second.GetCTRL_ID();
@@ -195,7 +213,7 @@ void GetSlavesXMLSnapShot(const char **ppXMLSnapShot)
          // Log current timestamp as well
          XMLSnapShot += " NOW_TS=\"";
          XMLSnapShot += time(nullptr);
-         XMLSnapShot += "\"";
+         XMLSnapShot += "\" >";
          XMLSnapShot += "</Slave>";
       }
    }

@@ -385,12 +385,12 @@ serveSnapShotXML (const void *cls,
 
    const char *pCmd = MHD_lookup_connection_value(connection, MHD_GET_ARGUMENT_KIND, "Cmd");
 #ifdef DUMP
-   printf("Cmd = %s\n", pCmd);
+//   printf("Cmd = %s\n", pCmd);
 #endif
 
    // The XML is filled up by the CommandDispatcher using a static string object.
    // Since this is a .c file, we cannot use class objects here, so we basically
-   // extract a char point from it.
+   // extract a char point from it
    const char *pString;
    // Dispatch the command
    CommandDispatcher(&pString, pCmd);

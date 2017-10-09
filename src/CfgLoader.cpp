@@ -177,6 +177,21 @@ void LoadCfgFile(const char CfgFilePath[])
          }
       }
    }
+   // This define can be uncommented to simulate a CAN message on the first
+   // Slave present in memory. This is useful to debug and tune the web page
+   // on OsX, where the CAN part is not working, since the SocketCAN have not been ported.
+#define SIMULATECANMSG   
+#ifdef SIMULATECANMSG
+   int FirstID = SlaveGetFirstID();
+   if (FirstID)
+   {
+	   byte Relays[4] = { 0x00, 0x01, 0x00, 0x01 };
+	   // Emulate a CAN message with some relays combination and use the "now" timestamp
+	   Slave_Update_Relays_And_TimeStamp(Relays, time(nullptr), FirstID);
+   }
+#endif
+
+      
 #ifdef DUMP
 	Slave_DUMPSlavesForDebug();
 #endif

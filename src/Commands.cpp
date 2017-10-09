@@ -15,6 +15,7 @@
      License along with this library; if not, write to the Free Software
      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
+#include <stdio.h> 
 #include <pthread.h>
 #include <Commands.h>
 #include <Slaves.h>
@@ -49,6 +50,13 @@ void CommandDispatcher(const char **ppXMLSnapShot, const char Cmd[])
 
    // Always returns a Slaves snapshot
    GetSlavesXMLSnapShot(ppXMLSnapShot);
+   
+#ifdef DUMP
+   static int Count = 1;
+   
+   if (Count++ == 1)
+	   printf("%s\n", *ppXMLSnapShot);
+#endif
 
    pthread_mutex_unlock(&sCmdMutex);
 }
