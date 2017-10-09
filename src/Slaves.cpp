@@ -34,6 +34,14 @@ using namespace std;
 // Expire TimeStamp default in msec
 #define Expire_TS_Default  3000
 
+template <typename I> std::string IntToHEXStr(I w, size_t hex_len = sizeof(I)<<1) 
+{
+    static const char* digits = "0123456789ABCDEF";
+    std::string rc(hex_len,'0');
+    for (size_t i=0, j=(hex_len-1)*4 ; i<hex_len; ++i,j-=4)
+        rc[i] = digits[(w>>j) & 0x0f];
+    return "0x" + rc;
+}
 
 class CSlaveValue
 {
@@ -198,7 +206,7 @@ void GetSlavesXMLSnapShot(const char **ppXMLSnapShot)
       {
          XMLSnapShot += "<Slave";
          XMLSnapShot += " ID=\"";
-         XMLSnapShot += std::to_string(it.first);
+         XMLSnapShot += IntToHEXStr(it.first);
          XMLSnapShot += "\"";
          XMLSnapShot += " CTRL_ID=\"";
          XMLSnapShot += it.second.GetCTRL_ID();
