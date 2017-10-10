@@ -208,20 +208,10 @@ void GetSlavesXMLSnapShot(const char **ppXMLSnapShot)
          XMLSnapShot += " ID=\"";
          XMLSnapShot += IntToHEXStr(it.first);
          XMLSnapShot += "\"";
-         XMLSnapShot += " CTRL_ID=\"";
-         XMLSnapShot += it.second.GetCTRL_ID();
-         XMLSnapShot += "\"";
-         // Log the TimeStamp when the last status message has arrived
-         XMLSnapShot += " TS=\"";
-         XMLSnapShot += it.second.GetTS();
-         XMLSnapShot += "\"";
-         XMLSnapShot += " EXP_TS=\"";
-         XMLSnapShot += it.second.GetExpireTS();
-         XMLSnapShot += "\"";
          // Log current timestamp as well
-         XMLSnapShot += " NOW_TS=\"";
-         XMLSnapShot += time(nullptr);
-         XMLSnapShot += "\" >";
+         XMLSnapShot += " DELTA=\"";
+         XMLSnapShot += std::to_string(it.second.GetExpireTS() - time(nullptr) + it.second.GetTS());
+         XMLSnapShot += "\">";
          XMLSnapShot += "</Slave>";
       }
    }

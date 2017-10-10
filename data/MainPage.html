@@ -45,7 +45,7 @@ function ParseXML(xmlDoc)
    if (xmlDoc == null)
       return;
    // Fill the main table
-   x = xmlDoc.getElementsByTagName("Tag");
+   x = xmlDoc.getElementsByTagName("Slave");
    txt = "<table border='1'><tr><th>CAN ID</th><th>Relays</th><th>Time to Expire</th></tr>";
    // Check if the Slaves list is empty
    if (x.length == 0)
@@ -64,10 +64,9 @@ function ParseXML(xmlDoc)
          // TODO: Relays
          txt = txt + "<td>" + "</td>";
          // Dump Time to Expire
-         var Now = x[i].getAttribute('NOW_TS');
-         var TS = x[i].getAttribute('TS');
-         var TimeToExpire = Now - TS;
-         txt = txt + "<td>" + TimeToExpire + "</td>";
+         var Delta = x[i].getAttribute('DELTA');
+         txt = txt + "<td>" + Delta + "</td>";
+		 txt = txt + "</tr>";
       }
    }
    txt = txt + "</table>";
