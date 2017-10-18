@@ -221,10 +221,16 @@ void GetSlavesXMLSnapShot(const char **ppXMLSnapShot)
          XMLSnapShot += " ID=\"";
          XMLSnapShot += IntToHEXStr<int>(it.first);
          XMLSnapShot += "\"";
-         // Log current timestamp as well
          XMLSnapShot += " DELTA=\"";
          XMLSnapShot += std::to_string(it.second.GetExpireTS() - GetMillis() + it.second.GetTS());
          XMLSnapShot += "\">";
+		 // Log the relays status as children and not as attributes
+		 for (int i=0; i<NUM_RELAYS; ++i)
+		 {
+			 XMLSnapShot += "<R>";
+			 XMLSnapShot += std::to_string(it.second.GetRelays()[i]);
+			 XMLSnapShot += "</R>";
+		 }
          XMLSnapShot += "</Slave>";
       }
    }
