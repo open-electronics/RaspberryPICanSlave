@@ -16,6 +16,8 @@
      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // Avoid problems with STL under OsX
+#include <time.h>
+#include <math.h>
 #ifdef __linux__
 #include <string.h>
 #else
@@ -34,6 +36,17 @@ using namespace std;
 // Expire TimeStamp default in msec
 #define Expire_TS_Default  3000
 
+// This f() returns the current epoch time in ms
+unsigned long GetMillis(void)
+ {
+	struct timespec spec;
+
+    clock_gettime(CLOCK_REALTIME, &spec);
+
+    return (unsigned long)spec.tv_sec * 1000L + round(spec.tv_nsec / 1.0e6);
+}
+
+// This f() turns the 
 template <typename I> std::string IntToHEXStr(I w, size_t hex_len = sizeof(I)<<1) 
 {
     static const char* digits = "0123456789ABCDEF";
@@ -48,8 +61,8 @@ class CSlaveValue
 private:
    int            m_CTRL_ID;             // The Control CAN message ID, i.e. the one to be used to sent relays command to the slave. Read by the CFG.
    byte           m_Relays[NUM_RELAYS];  // Payload of the CAN message: lowest 4 bits represents the 4 relays ON/OFF states
-   unsigned long  m_TimeStamp;           // Last message TimeStamp arrival. When 0, the slave is unmapped (i.e. no messages have never arrived)
-   int            m_ExpireTimeStamp;     // This is the threshold in msec to be added to the last status message arrival. After it, the Slave is considered "Out of date". Read by the CFG.
+   unsigned long  m_TimeStamp;           // Last message TimeStamp arrival, in ms. When 0, the slave is unmapped (i.e. no messages have never arrived)
+   int            m_ExpireTimeStamp;     // This is the threshold in ms to be added to the last status message arrival. After it, the Slave is considered "Out of date". Read by the CFG.
 
 public:
    // Ctor
@@ -121,7 +134,7 @@ void Slave_Update_CTRL_ID(const int CTRL_ID, const int ID)
    pthread_mutex_unlock(&sMutex);
 }
 
-void Slave_Update_Relays_And_TimeStamp(const byte Relays[], const int TimeStamp, const int ID)
+void Slave_Update_Relays_And_TimeStamp(const byte Relays[], const unsigned long TimeStamp, const int ID)
 {
    pthread_mutex_lock(&sMutex);
    // The Slave repo is not empty so far. Let's find a given ID match
@@ -206,11 +219,11 @@ void GetSlavesXMLSnapShot(const char **ppXMLSnapShot)
       {
          XMLSnapShot += "<Slave";
          XMLSnapShot += " ID=\"";
-         XMLSnapShot += IntToHEXStr(it.first);
+         XMLSnapShot += IntToHEXStr<int>(it.first);
          XMLSnapShot += "\"";
          // Log current timestamp as well
          XMLSnapShot += " DELTA=\"";
-         XMLSnapShot += std::to_string(it.second.GetExpireTS() - time(nullptr) + it.second.GetTS());
+         XMLSnapShot += std::to_string(it.second.GetExpireTS() - GetMillis() + it.second.GetTS());
          XMLSnapShot += "\">";
          XMLSnapShot += "</Slave>";
       }

@@ -30,13 +30,13 @@ typedef unsigned char   byte;
 extern "C" {
 #endif
 	
-
+unsigned long GetMillis				(void);
 void SlavesInit						(void);
 void SlavesQuit						(void);
 int	 SlavesAreEmpty					(void);
 void Slave_AddID					(const int ID);
 void Slave_Update_CTRL_ID			(const int CTRL_ID, const int ID);
-void Slave_Update_Relays_And_TimeStamp(const byte Relays[], const int TimeStamp, const int ID);
+void Slave_Update_Relays_And_TimeStamp(const byte Relays[], const unsigned long TimeStamp, const int ID);
 void Slave_Update_TimeStamp			(const int TimeStamp, const int ID);
 void Slave_Update_ExpireTS			(const int ExpireTS, const int ID);
 int  SlaveGetFirstID				(void);

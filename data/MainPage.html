@@ -2,16 +2,14 @@
 <html>
 <head>
 
-<style>
-table, td
-{
-    border: 1px solid black;
-}
+   <style>
+      table, td {
+         border: 1px solid black;
+      }
+   </style>
 
-</style>
+   <script>
 
-<script>
-	
    function getXmlHttpRequestObject()
    {
       if (window.XMLHttpRequest)
@@ -26,18 +24,15 @@ table, td
 			 alert("Your Browser does not support AJAX!\nIt's about time to upgrade don't you think?");
 		}
 	 }
- 
+
 //XmlHttpRequest global object
  var req = getXmlHttpRequestObject();
-
 // Main interval to poll the Slaves status from server
 var SnapShotInterval = setInterval(getRequestRefresh, 500);
-
 var Seconds = 0;
 var HandlerCounter = 0;
 // Synch Callback for showing the total number of frames and the related fps
 setInterval(IncreaseFreqCount, 1000);
-
 function IncreaseFreqCount()
 {
 	Seconds = Seconds + 1;
@@ -47,7 +42,6 @@ function IncreaseFreqCount()
 	txt = HandlerCounter.toFixed(1) + "/" + Seconds.toFixed(1) + "=" + Num.toFixed(1);
 	document.getElementById("fps").innerHTML=txt;
 }
-
 function chooseUser(entry, Idx)
 {
     switch (entry)
@@ -67,75 +61,66 @@ function chooseUser(entry, Idx)
 function CreateRelay(Row, Idx, Value)
 {
     var z = document.createElement("TD");
- 
+
     var btn = document.createElement('input');
     btn.type = "button";
     btn.className = "btn";
     btn.style.width = "100%";
     btn.value = "Set";
     btn.onclick = (function(entry, Idx) {return function() {chooseUser(entry, Idx);}})(1, Idx);
-   
+
     z.appendChild(btn);
     var br = document.createElement("br");
     z.appendChild(br);
-
     var btn = document.createElement('input');
     btn.type = "button";
     btn.className = "btn";
-    btn.style.width = "100%";   
+    btn.style.width = "100%";
     btn.value = "Reset";
     btn.onclick = (function(entry, Idx) {return function() {chooseUser(entry, Idx);}})(2, Idx);
-
-
     z.appendChild(btn);
      var br = document.createElement("br");
     z.appendChild(br);
-
     var btn = document.createElement('input');
     btn.type = "button";
     btn.className = "btn";
-    btn.style.width = "100%";   
+    btn.style.width = "100%";
     btn.value = "Toggle";
     btn.onclick = (function(entry, Idx) {return function() {chooseUser(entry, Idx);}})(3, Idx);
-
-
     z.appendChild(btn);
     var br = document.createElement("br");
     z.appendChild(br);
-
     var t = document.createTextNode(Value);
-//    t.style.align = "center"; 
-    z.appendChild(t); 
-    
+//    t.style.align = "center";
+    z.appendChild(t);
+
     if (Value == "ON")
         z.style.backgroundColor = "green"
     else
         z.style.backgroundColor = "red"
-    
+
     Row.appendChild(z);
 }
-
 function CreateSlave(Row, Relays, TTE)
 {
     // Create a cell for the Slave ID
     var z = document.createElement("TD");
     Row.appendChild(z);
     var t = document.createTextNode("0x1FFF0010");
-    z.appendChild(t);     
-    
-    // Create the relays cells
-    for (i = 0; i < 4; i++)
-        CreateRelay(Row, i, Relays[i]);
+    z.appendChild(t);
 
+    // Create the relays cells
+    for (i = 0; i < Relays.length; i++)
+        CreateRelay(Row, i, Relays[i]);
     // Create the Slave Status
     var z = document.createElement("TD");
     Row.appendChild(z);
-    var label = document.createElement('label');    
+    var label = document.createElement('label');
     var String;
     if (TTE > 0)
         String = "Slave Is Alive";
     else
-        String = "Slave Is OutToDate";
+        String = "Slave Is Out Of Date";
     var t = document.createTextNode(String);
     if (TTE > 0)
         label.style.color = "green";
@@ -151,19 +136,33 @@ function CreateSlave(Row, Relays, TTE)
     var t = document.createTextNode(String);
     z.appendChild(t);
 }
-
-function myFunction(table)
+function UpdateSlave(table, CANId, Row, Relays, ExpireTS)
 {
-	table.innerHTML = "";
-	
-    var y = document.createElement("TR");
-    table.appendChild(y);
-    
-    var Relays = ["ON", "OFF", "ON", "OFF"];
-    
-    CreateSlave(y, Relays, 2.3);
-}
+	console.log("Update");
+   // Gets the children <td> from 1 -> Relays.length and update them text/colors
+   var RowChildren = Row.childNodes;
+   for (i=0; i < Relays.length; i++)
+   {
 
+
+   }
+}
+function AppendSlave(table, CANId, Relays, ExpireTS)
+{
+	console.log("Append");
+	
+	table.innerHTML = "";
+
+	var Row = document.createElement("TR");
+   // Assign an Id to the row == CANId. This will be used ti check
+   // whether an existing Slave is already present, in order to update
+   // its entry, instead of rebuilding from scratch.
+	Row.id = CANId;
+
+   table.appendChild(Row);
+
+   CreateSlave(Row, Relays, ExpireTS);
+}
 function ParseXML(xmlDoc)
 {
    if (xmlDoc == null)
@@ -171,8 +170,6 @@ function ParseXML(xmlDoc)
    // Fill the main table
    x = xmlDoc.getElementsByTagName("Slave");
    var table = document.getElementById('MasterTable');
- //  table.innerHTML = txt;
- 
    //Check if the Slaves list is empty
    if (x.length == 0)
    {
@@ -182,31 +179,24 @@ function ParseXML(xmlDoc)
    }
    else
    {
+      var Id, Row;
 
-	   myFunction(table);
-/*
-      // Build the MasterTable
-	  var tr, td;
-      for (i = 0; i < x.length; i++)
-      {
-		 tr = document.createElement("tr");
-		 table.appendChild(tr);
-		 tr.appendChild(td = document.createElement("td"));
-		 td.innerHTML = x[i].getAttribute('ID');
-/*
-         // TODO: Relays
-         txt = txt + "<td>";
-		 txt = txt + <button class="editbtn">On</button>;
-		 txt = txt + "</td>";*/
-	   
-         // Dump Time to Expire
-/*         var Delta = x[i].getAttribute('DELTA');
-		 tr.appendChild(td = document.createElement("td"));
-		 td.innerHTML = Delta;*/
+      // Build/update the MasterTable
+	   for (i = 0; i < x.length; i++)
+	   {
+	      Id = x[i].getAttribute('ID');
+	      // Just for debug (TODO: 2B read from the XML)
+	      var Relays = ["ON", "OFF", "ON", "OFF"];
+	      var ExpireTS = 2.3;
+	      // Search if there's an existing matching Id row in the HTML
+	      Row = document.getElementById(Id);
+	      if (Row == null)
+	         AppendSlave(table, Id, Relays, ExpireTS);
+	      else
+	         UpdateSlave(table, Id, Row, Relays, ExpireTS);
+	   }
    }
 }
-
-
 function handleResponse()
 {
    if (req.readyState == 4)
@@ -215,19 +205,17 @@ function handleResponse()
       HandlerCounter = HandlerCounter + 1;
    }
 }
-
 function getRequestRefresh()
  {
 	 getRequest('/data/SnapShot.xml', 'Refresh', handleResponse);
  }
-
 function getRequest(resource, command, handleResponse)
  {
 	// Stop SnapShot interval until this request will have been served
 	// handle the case where a querystring is not detected
 	String = resource + "?" + 'Cmd=' + command + "&" + 'ms=' + new Date().getTime();
 	//alert(String);
-	
+
 	if (req.readyState == 4 || req.readyState == 0)
 	{
 		 req.open("GET", String, true);
@@ -236,15 +224,14 @@ function getRequest(resource, command, handleResponse)
 	 	 return false;
  	}
 }
-
-</script>
+   </script>
 
 </head>
 <body>
 
-<div id='MasterTable'></div><br>
-<div id='frames'></div><br>
-<div id='fps'></div><br>
+   <div id='MasterTable'></div><br>
+   <div id='frames'></div><br>
+   <div id='fps'></div><br>
 
 </body>
 </html>
