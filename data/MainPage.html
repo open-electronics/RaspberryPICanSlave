@@ -33,6 +33,7 @@ var Seconds = 0;
 var HandlerCounter = 0;
 // Synch Callback for showing the total number of frames and the related fps
 setInterval(IncreaseFreqCount, 1000);
+
 function IncreaseFreqCount()
 {
 	Seconds = Seconds + 1;
@@ -42,6 +43,7 @@ function IncreaseFreqCount()
 	txt = HandlerCounter.toFixed(1) + "/" + Seconds.toFixed(1) + "=" + Num.toFixed(1);
 	document.getElementById("fps").innerHTML=txt;
 }
+
 function chooseUser(entry, Idx)
 {
     switch (entry)
@@ -58,7 +60,23 @@ function chooseUser(entry, Idx)
     }
 }
 
-function CreateRelay(Row, Idx, Value)
+function UpdateRelay(TD, Value, SlaveIdx, Idx)
+{
+	console.log("S" + SlaveIdx + "R" + Idx);
+	var Txt = document.getElementById("S" + SlaveIdx + "R" + Idx);
+    if (Value == 1)
+	{
+        TD.style.backgroundColor = "green";
+		Txt.nodeValue = "ON";
+	}
+    else
+	{
+        TD.style.backgroundColor = "red";
+		Txt.nodeValue = "OFF";
+	}
+}
+
+function CreateRelay(Row, Idx, Value, SlaveIdx)
 {
     var z = document.createElement("TD");
 
@@ -90,18 +108,16 @@ function CreateRelay(Row, Idx, Value)
     z.appendChild(btn);
     var br = document.createElement("br");
     z.appendChild(br);
-    var t = document.createTextNode(Value);
-//    t.style.align = "center";
+    var t = document.createTextNode("0");
+	t.id = "S" + SlaveIdx + "R" + Idx;
     z.appendChild(t);
-
-    if (Value == "ON")
-        z.style.backgroundColor = "green"
-    else
-        z.style.backgroundColor = "red"
+	// Update the cell text value and background color
+	UpdateRelay(z, Value, SlaveIdx, Idx);
 
     Row.appendChild(z);
 }
-function CreateSlave(Row, Relays, TTE)
+
+function CreateSlave(Row, Relays, TTE, SlaveIdx)
 {
     // Create a cell for the Slave ID
     var z = document.createElement("TD");
@@ -111,7 +127,7 @@ function CreateSlave(Row, Relays, TTE)
 
     // Create the relays cells
     for (i = 0; i < Relays.length; i++)
-        CreateRelay(Row, i, Relays[i]);
+        CreateRelay(Row, i, Relays[i], SlaveIdx);
     // Create the Slave Status
     var z = document.createElement("TD");
     Row.appendChild(z);
@@ -136,6 +152,7 @@ function CreateSlave(Row, Relays, TTE)
     var t = document.createTextNode(String);
     z.appendChild(t);
 }
+
 function UpdateSlave(table, CANId, Row, Relays, ExpireTS)
 {
 	console.log("Update");
@@ -143,11 +160,13 @@ function UpdateSlave(table, CANId, Row, Relays, ExpireTS)
    var RowChildren = Row.childNodes;
    for (i=0; i < Relays.length; i++)
    {
+	   
 
 
    }
 }
-function AppendSlave(table, CANId, Relays, ExpireTS)
+
+function AppendSlave(table, CANId, Relays, ExpireTS, SlaveIdx)
 {
 	console.log("Append");
 	
@@ -161,8 +180,9 @@ function AppendSlave(table, CANId, Relays, ExpireTS)
 
    table.appendChild(Row);
 
-   CreateSlave(Row, Relays, ExpireTS);
+   CreateSlave(Row, Relays, ExpireTS, SlaveIdx);
 }
+
 function ParseXML(xmlDoc)
 {
    if (xmlDoc == null)
@@ -186,17 +206,18 @@ function ParseXML(xmlDoc)
 	   {
 	      Id = x[i].getAttribute('ID');
 	      // Just for debug (TODO: 2B read from the XML)
-	      var Relays = ["ON", "OFF", "ON", "OFF"];
+	      var Relays = [1, 0, 1, 0];
 	      var ExpireTS = 2.3;
 	      // Search if there's an existing matching Id row in the HTML
 	      Row = document.getElementById(Id);
 	      if (Row == null)
-	         AppendSlave(table, Id, Relays, ExpireTS);
+	         AppendSlave(table, Id, Relays, ExpireTS, i);
 	      else
 	         UpdateSlave(table, Id, Row, Relays, ExpireTS);
 	   }
    }
 }
+
 function handleResponse()
 {
    if (req.readyState == 4)
