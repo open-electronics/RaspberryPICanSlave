@@ -60,25 +60,39 @@ function chooseUser(entry, Idx)
     }
 }
 
-function UpdateRelay(TD, Value, SlaveIdx, Idx)
+function UpdateRelay(ExtTD, Value, SlaveIdx, Idx)
 {
-	console.log("S" + SlaveIdx + "R" + Idx);
-	var Txt = document.getElementById("S" + SlaveIdx + "R" + Idx);
-    if (Value == 1)
+	var TD;
+	// If an ExtTD is given, use it otherwise retrieve building its Id
+	if (ExtTD != null)
+		TD = ExtTD;
+	else
 	{
-        TD.style.backgroundColor = "green";
-		Txt.nodeValue = "ON";
+		var Id = "S" + SlaveIdx + "R" + Idx;
+		TD = document.getElementById(Id);
+		console.log(TD);
 	}
-    else
+	if (TD != null) 
 	{
-        TD.style.backgroundColor = "red";
-		Txt.nodeValue = "OFF";
+	   console.log("S" + SlaveIdx + "R" + Idx + ": FOUND!!! " + "Value = " + Value);
+	   if (Value == 1) 
+	   {
+	      TD.style.backgroundColor = "green";
+	      TD.nodeValue = "ON";
+	   }
+	   else 
+	   {
+	      TD.style.backgroundColor = "red";
+	      TD.nodeValue = "OFF";
+	   }
 	}
 }
 
 function CreateRelay(Row, Idx, Value, SlaveIdx)
 {
     var z = document.createElement("TD");
+	
+	z.id = "S" + SlaveIdx + "R" + Idx;
 
     var btn = document.createElement('input');
     btn.type = "button";
@@ -109,7 +123,7 @@ function CreateRelay(Row, Idx, Value, SlaveIdx)
     var br = document.createElement("br");
     z.appendChild(br);
     var t = document.createTextNode("0");
-	t.id = "S" + SlaveIdx + "R" + Idx;
+
     z.appendChild(t);
 	// Update the cell text value and background color
 	UpdateRelay(z, Value, SlaveIdx, Idx);
@@ -117,32 +131,47 @@ function CreateRelay(Row, Idx, Value, SlaveIdx)
     Row.appendChild(z);
 }
 
-function CreateSlave(Row, Relays, TTE, SlaveIdx)
+function UpdateAliveStuff(TTE, SlaveIdx)
+{
+   console.log("L1-" + SlaveIdx);
+   var label = document.getElementById("L1-" + SlaveIdx);
+   if (label != null)
+   {
+      var c = label.childNodes;
+      if (c != null) {
+         if (TTE > 0)
+            c.nodeValue = "Slave Is Alive";
+         else
+            c.nodeValue = "Slave Is Out Of Date";
+      }
+      if (TTE > 0)
+         label.style.color = "green";
+      else
+         label.style.color = "red";
+   }
+}
+
+function CreateSlave(Row, ID, Relays, TTE, SlaveIdx)
 {
     // Create a cell for the Slave ID
     var z = document.createElement("TD");
     Row.appendChild(z);
-    var t = document.createTextNode("0x1FFF0010");
+    var t = document.createTextNode(ID);
     z.appendChild(t);
 
     // Create the relays cells
     for (i = 0; i < Relays.length; i++)
         CreateRelay(Row, i, Relays[i], SlaveIdx);
-    // Create the Slave Status
+
+   // Create the Slave Status
     var z = document.createElement("TD");
     Row.appendChild(z);
     var label = document.createElement('label');
-    var String;
-    if (TTE > 0)
-        String = "Slave Is Alive";
-    else
-        String = "Slave Is Out Of Date";
-    var t = document.createTextNode(String);
-    if (TTE > 0)
-        label.style.color = "green";
-    else
-        label.style.color = "red";
+    label.id = "L1-" + SlaveIdx;
     label.appendChild(t);
+   // Update the just created text
+    UpdateAliveStuff(TTE, SlaveIdx);
+
     z.appendChild(label);
     var br = document.createElement("br");
     z.appendChild(br);
@@ -160,6 +189,7 @@ function UpdateSlave(table, CANId, Row, Relays, ExpireTS)
    var RowChildren = Row.childNodes;
    for (i=0; i < Relays.length; i++)
    {
+	   UpdateRelay(null, Relays[i], 0, i);
 	   
 
 
@@ -176,11 +206,11 @@ function AppendSlave(table, CANId, Relays, ExpireTS, SlaveIdx)
    // Assign an Id to the row == CANId. This will be used ti check
    // whether an existing Slave is already present, in order to update
    // its entry, instead of rebuilding from scratch.
-	Row.id = CANId;
+   Row.id = CANId;
 
    table.appendChild(Row);
 
-   CreateSlave(Row, Relays, ExpireTS, SlaveIdx);
+   CreateSlave(Row, CANId, Relays, ExpireTS, SlaveIdx);
 }
 
 function ParseXML(xmlDoc)
@@ -207,6 +237,7 @@ function ParseXML(xmlDoc)
 	      Id = x[i].getAttribute('ID');
 	      // Just for debug (TODO: 2B read from the XML)
 	      var Relays = [1, 0, 1, 0];
+	      //var Relays = x[i].childNodes;
 	      var ExpireTS = 2.3;
 	      // Search if there's an existing matching Id row in the HTML
 	      Row = document.getElementById(Id);
