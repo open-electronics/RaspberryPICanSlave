@@ -242,7 +242,7 @@ function ParseXML(xmlDoc)
    }
    else
    {
-	   var Id, Row, ExpireTS;
+	   var Id, Row, ExpireTS, Relays = [];
 
       // Build/update the MasterTable
 	   for (i = 0; i < x.length; i++)
@@ -250,8 +250,15 @@ function ParseXML(xmlDoc)
 	      Id = x[i].getAttribute('ID');
 		  ExpireTS = x[i].getAttribute('DELTA');
 	      // Just for debug (TODO: 2B read from the XML)
-	      var Relays = [1, 0, 1, 0];
-	      //var Relays = x[i].childNodes;
+	      var Children = x[i].getElementsByTagName("R");
+		  console.log(Children);
+		  for (j=0; j < Children.length; j++)
+		  {
+			  console.log(Children[j].firstChild);
+			  Relays.push(Children[j].firstChild);
+		  }
+		  		  console.log(Relays);
+	      
 	      //var ExpireTS = 2.3;
 	      // Search if there's an existing matching Id row in the HTML
 	      Row = document.getElementById(Id);
