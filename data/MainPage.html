@@ -28,7 +28,7 @@
 //XmlHttpRequest global object
  var req = getXmlHttpRequestObject();
 // Main interval to poll the Slaves status from server
-var SnapShotInterval = setInterval(getRequestRefresh, 200);
+var SnapShotInterval = setInterval(getRequestRefresh, 500);
 var Seconds = 0;
 var HandlerCounter = 0;
 // Synch Callback for showing the total number of frames and the related fps
@@ -70,17 +70,13 @@ function UpdateRelay(ExtTD, Value, SlaveIdx, Idx)
 	{
 		var Id = "S" + SlaveIdx + "C" + Idx;
 		TD = document.getElementById(Id);
-		console.log(TD);
 	}
 	if (TD != null) 
 	{
-	   console.log("S" + SlaveIdx + "C" + Idx + ": FOUND!!! " + "Value = " + Value);
 	   // Check if the sisth child, i.e. the TextNode, has already been appended
 	   var Child = TD.childNodes[6];
-	   console.log(Child);
 	   if (Child == null)
 	   {
-		   console.log("Append TextNode");
        		var t = document.createTextNode("0");
        	 	TD.appendChild(t);
 			Child = TD.childNodes[6];
@@ -141,16 +137,15 @@ function CreateRelay(Row, Idx, Value, SlaveIdx)
 function UpdateAliveStuff(TTE, SlaveIdx, ExtTD)
 {
 	var TD;
-	
+		
 	// Use the external TD, if given or retrieve it from the hash tag
 	if(ExtTD != null)
 		TD = ExtTD;
 	else
-		TD = document.getElementById("S" + SlaveIdx + "R5");
+		TD = document.getElementById("S" + SlaveIdx + "C5");
    if (TD != null)
    {	   
-	   console.log(TTE);
-	   // The first TD child is a label, and its first child it's the "Alive" text
+	  // The first TD child is a label, and its first child it's the "Alive" text
       var Txt = TD.childNodes[0].childNodes[0];
       if (Txt != null)
 	  {
@@ -160,12 +155,18 @@ function UpdateAliveStuff(TTE, SlaveIdx, ExtTD)
             Txt.nodeValue = "Slave Is Out Of Date";
       }
       if (TTE > 0)
+	  {
          TD.childNodes[0].style.color = "green";
+   	  	 // Update the Time to expire
+   	  	 TD.childNodes[3].nodeValue = "Time to Expire: " + parseFloat(TTE/1000).toFixed(1) + "s";
+	  }
       else
+	  {
          TD.childNodes[0].style.color = "red";
-	  // Update the Time to expire
-	  TD.childNodes[3].nodeValue = "Time to Expire: " + TTE + "s";
-   }
+   	  	 // Update the Time to expire
+   	  	 TD.childNodes[3].nodeValue = "";
+  	  }
+	}
 }
 
 function CreateSlave(Row, ID, Relays, TTE, SlaveIdx)
@@ -203,7 +204,6 @@ function CreateSlave(Row, ID, Relays, TTE, SlaveIdx)
 
 function UpdateSlave(table, CANId, Row, Relays, TTE)
 {
-	console.log("Update");
    // Gets the children <td> from 1 -> Relays.length and update them text/colors
    for (i=0; i < Relays.length; i++)
 	  UpdateRelay(null, Relays[i], 0, i);
@@ -213,8 +213,6 @@ function UpdateSlave(table, CANId, Row, Relays, TTE)
 
 function AppendSlave(table, CANId, Relays, ExpireTS, SlaveIdx)
 {
-	console.log("Append");
-	
 	table.innerHTML = "";
 
 	var Row = document.createElement("TR");
@@ -251,7 +249,6 @@ function ParseXML(xmlDoc)
 	   {
 	      Id = x[i].getAttribute('ID');
 		  ExpireTS = x[i].getAttribute('DELTA');
-		  console.log(ExpireTS);
 	      // Just for debug (TODO: 2B read from the XML)
 	      var Relays = [1, 0, 1, 0];
 	      //var Relays = x[i].childNodes;

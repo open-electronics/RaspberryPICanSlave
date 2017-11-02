@@ -30,7 +30,7 @@ typedef unsigned char   byte;
 extern "C" {
 #endif
 	
-long GetMillis				(void);
+long GetMillis						(void);
 void SlavesInit						(void);
 void SlavesQuit						(void);
 int	 SlavesAreEmpty					(void);

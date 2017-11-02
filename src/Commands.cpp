@@ -54,7 +54,7 @@ void CommandDispatcher(const char **ppXMLSnapShot, const char Cmd[])
 #ifdef DUMP
    static int Count = 1;
    
-   //  if (Count++ == 1)
+    if (Count++ == 1)
 	   printf("%s\n", *ppXMLSnapShot);
 #endif
 
