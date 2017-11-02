@@ -37,13 +37,13 @@ using namespace std;
 #define Expire_TS_Default  3000
 
 // This f() returns the current epoch time in ms
-unsigned long GetMillis(void)
+long GetMillis(void)
  {
 	struct timespec spec;
 
     clock_gettime(CLOCK_REALTIME, &spec);
 
-    return (unsigned long)spec.tv_sec * 1000L + round(spec.tv_nsec / 1.0e6);
+    return spec.tv_sec * 1000L + round(spec.tv_nsec / 1.0e6);
 }
 
 // This f() turns the 
@@ -61,7 +61,7 @@ class CSlaveValue
 private:
    int            m_CTRL_ID;             // The Control CAN message ID, i.e. the one to be used to sent relays command to the slave. Read by the CFG.
    byte           m_Relays[NUM_RELAYS];  // Payload of the CAN message: lowest 4 bits represents the 4 relays ON/OFF states
-   unsigned long  m_TimeStamp;           // Last message TimeStamp arrival, in ms. When 0, the slave is unmapped (i.e. no messages have never arrived)
+   long 		  m_TimeStamp;           // Last message TimeStamp arrival, in ms. When 0, the slave is unmapped (i.e. no messages have never arrived)
    int            m_ExpireTimeStamp;     // This is the threshold in ms to be added to the last status message arrival. After it, the Slave is considered "Out of date". Read by the CFG.
 
 public:
@@ -80,7 +80,7 @@ public:
    // Getters
    int   GetCTRL_ID     (void) const                { return m_CTRL_ID; }
    const byte*  GetRelays(void) const                { return m_Relays; }
-   unsigned long GetTS   (void) const                 { return m_TimeStamp; }
+   long GetTS   (void) const                 		{ return m_TimeStamp; }
    int   GetExpireTS    (void) const                { return m_ExpireTimeStamp; }
 };
 
@@ -222,7 +222,8 @@ void GetSlavesXMLSnapShot(const char **ppXMLSnapShot)
          XMLSnapShot += IntToHEXStr<int>(it.first);
          XMLSnapShot += "\"";
          XMLSnapShot += " DELTA=\"";
-         XMLSnapShot += std::to_string(it.second.GetExpireTS() - GetMillis() + it.second.GetTS());
+ //        XMLSnapShot += std::to_string(it.second.GetExpireTS() - GetMillis() + it.second.GetTS());
+         XMLSnapShot += std::to_string(GetMillis());// - it.second.GetTS());
          XMLSnapShot += "\">";
 		 // Log the relays status as children and not as attributes
 		 for (int i=0; i<NUM_RELAYS; ++i)
