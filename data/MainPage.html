@@ -249,17 +249,9 @@ function ParseXML(xmlDoc)
 	   {
 	      Id = x[i].getAttribute('ID');
 		  ExpireTS = x[i].getAttribute('DELTA');
-	      // Just for debug (TODO: 2B read from the XML)
 	      var Children = x[i].getElementsByTagName("R");
-		  console.log(Children);
 		  for (j=0; j < Children.length; j++)
-		  {
-			  console.log(Children[j].firstChild);
-			  Relays.push(Children[j].firstChild);
-		  }
-		  		  console.log(Relays);
-	      
-	      //var ExpireTS = 2.3;
+			  Relays.push(Number(Children[j].firstChild.data));
 	      // Search if there's an existing matching Id row in the HTML
 	      Row = document.getElementById(Id);
 	      if (Row == null)
