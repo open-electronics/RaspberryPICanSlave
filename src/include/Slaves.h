@@ -43,7 +43,7 @@ void SlavesQuit						(void);
 int	 SlavesAreEmpty					(void);
 void Slave_AddID					(const int ID);
 void Slave_Update_CTRL_ID			(const int CTRL_ID, const int ID);
-void Slave_Update_Relays_And_TimeStamp(const byte Relays[], const __int64 TimeStamp, const int ID);
+void Slave_Update_Relays_And_TimeStamp(const byte Relays[], const __int64 TimeStamp, const int ID, const bool bAdd);
 void Slave_Update_ExpireTS			(const __int64 ExpireTS, const int ID);
 int  SlaveGetFirstID				(void);
 void Slave_DUMPSlavesForDebug		(void);
