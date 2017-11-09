@@ -37,7 +37,7 @@ using namespace std;
 #define Expire_TS_Default  3000
 
 // This f() returns the current epoch time in ms
-long GetMillis(void)
+__int64 GetMillis(void)
  {
 	struct timespec spec;
 
@@ -61,7 +61,7 @@ class CSlaveValue
 private:
    int            m_CTRL_ID;             // The Control CAN message ID, i.e. the one to be used to sent relays command to the slave. Read by the CFG.
    byte           m_Relays[NUM_RELAYS];  // Payload of the CAN message: lowest 4 bits represents the 4 relays ON/OFF states
-   long 		  m_TimeStamp;           // Last message TimeStamp arrival, in ms. When 0, the slave is unmapped (i.e. no messages have never arrived)
+   __int64 		  m_TimeStamp;           // Last message TimeStamp arrival, in ms. When 0, the slave is unmapped (i.e. no messages have never arrived)
    int            m_ExpireTimeStamp;     // This is the threshold in ms to be added to the last status message arrival. After it, the Slave is considered "Out of date". Read by the CFG.
 
 public:
@@ -74,13 +74,13 @@ public:
    // Setters
    void  SetCTRL_ID     (const int CTRL_ID)              { m_CTRL_ID = CTRL_ID; }
    void  SetRelays      (const byte Relays[])            { memcpy(m_Relays, Relays, NUM_RELAYS); }
-   void  SetTS          (const unsigned long TimeStamp)  { m_TimeStamp = TimeStamp; }
+   void  SetTS          (const __int64 TimeStamp)	     { m_TimeStamp = TimeStamp; }
    void  SetExpireTS(const int ExpireTimeStamp)          { m_ExpireTimeStamp = ExpireTimeStamp; }
 
    // Getters
    int   GetCTRL_ID     (void) const                { return m_CTRL_ID; }
    const byte*  GetRelays(void) const                { return m_Relays; }
-   long GetTS   (void) const                 		{ return m_TimeStamp; }
+   __int64 GetTS   (void) const                 		{ return m_TimeStamp; }
    int   GetExpireTS    (void) const                { return m_ExpireTimeStamp; }
 };
 

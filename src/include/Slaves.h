@@ -25,12 +25,19 @@
 
 typedef unsigned char   byte;
 
+#ifdef __linux__
+	typedef 	long long		__int64;
+#else
+	typedef 	long			__int64;
+#endif
+		
+
 // Decoration to let C++ code be used from within plain C modules
 #ifdef __cplusplus
 extern "C" {
 #endif
 	
-long GetMillis						(void);
+__int64 GetMillis					(void);
 void SlavesInit						(void);
 void SlavesQuit						(void);
 int	 SlavesAreEmpty					(void);
