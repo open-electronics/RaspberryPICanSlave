@@ -16,7 +16,7 @@
      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // Avoid problems with STL under OsX
-#include <time.h>
+#include <sys/time.h>
 #include <math.h>
 #ifdef __linux__
 #include <string.h>
@@ -39,11 +39,11 @@ using namespace std;
 // This f() returns the current epoch time in ms
 __int64 GetMillis(void)
  {
-	struct timespec spec;
-
-    clock_gettime(CLOCK_REALTIME, &spec);
-
-    return spec.tv_sec * 1000L + round(spec.tv_nsec / 1.0e6);
+	 struct timeval te; 
+	 
+	 gettimeofday(&te, NULL); // get current time
+	 
+	 return (__int64)(te.tv_sec*1000LL + te.tv_usec/1000);
 }
 
 // This f() turns the 
