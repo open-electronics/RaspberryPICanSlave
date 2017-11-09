@@ -134,7 +134,7 @@ void Slave_Update_CTRL_ID(const int CTRL_ID, const int ID)
    pthread_mutex_unlock(&sMutex);
 }
 
-void Slave_Update_Relays_And_TimeStamp(const byte Relays[], const __int64 TimeStamp, const int ID)
+void Slave_Update_Relays_And_TimeStamp(const byte Relays[], const __int64 TimeStamp, const int ID, const byte bAdd)
 {
    pthread_mutex_lock(&sMutex);
    // The Slave repo is not empty so far. Let's find a given ID match

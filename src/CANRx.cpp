@@ -101,7 +101,7 @@ static void* CANRxThreadCbk(void *pPtr)
                 // in the first 4 bytes. Actually we are assuming the number of relays (4) is < transferred
                 // bytes in the can_frame (should be) without doing further tests.
                 // The f() updates the msg arrival TimeStamp using the system one.
-                Slave_Update_Relays_And_TimeStamp(rxmsg.data, GetMillis(), ID, false);
+                Slave_Update_Relays_And_TimeStamp(rxmsg.data, GetMillis(), ID, 0x00);
              }
           }
        }

@@ -187,7 +187,7 @@ void LoadCfgFile(const char CfgFilePath[])
    {
 	   byte Relays[4] = { 0x00, 0x01, 0x00, 0x01 };
 	   // Emulate a CAN message with some relays combination and use the "now" timestamp
-	   Slave_Update_Relays_And_TimeStamp(Relays, GetMillis(), FirstID, true);
+	   Slave_Update_Relays_And_TimeStamp(Relays, GetMillis(), FirstID, 0x01);
    }
 #endif
 
