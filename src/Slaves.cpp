@@ -222,7 +222,7 @@ void GetSlavesXMLSnapShot(const char **ppXMLSnapShot)
          XMLSnapShot += IntToHEXStr<int>(it.first);
          XMLSnapShot += "\"";
          XMLSnapShot += " DELTA=\"";
-		 printf("%lld %lld %lld\n", it.second.GetExpireTS(), GetMillis(), it.second.GetTS());
+		 printf("0x%8x %lld %lld %lld\n", it.first, it.second.GetExpireTS(), GetMillis(), it.second.GetTS());
          XMLSnapShot += std::to_string(__int64(it.second.GetExpireTS() - GetMillis() + it.second.GetTS()));
          XMLSnapShot += "\">";
 		 // Log the relays status as children and not as attributes
