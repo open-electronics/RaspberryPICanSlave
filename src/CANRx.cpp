@@ -89,6 +89,7 @@ static void* CANRxThreadCbk(void *pPtr)
              // Use a simple read on the descriptor
              if (read(sd, &rxmsg, sizeof(rxmsg)))
              {
+				 rxmsg &= 0x7FFFFFFF;
  #ifdef DUMP
                 printf("CAN_frame: ID = 0x%8x DLC = %d\n", rxmsg.can_id, rxmsg.can_dlc);
  #endif
