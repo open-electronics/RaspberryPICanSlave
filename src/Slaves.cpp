@@ -144,7 +144,7 @@ void Slave_Update_Relays_And_TimeStamp(const byte Relays[], const __int64 TimeSt
       it->second.SetRelays(Relays);
       it->second.SetTS(TimeStamp);
    }
-   else
+   else if (bAdd)
    {
       CSlaveValue Slave;
       Slave.SetRelays(Relays);
