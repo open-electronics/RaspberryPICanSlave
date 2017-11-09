@@ -91,7 +91,7 @@ static void* CANRxThreadCbk(void *pPtr)
              {
 				 rxmsg.can_id &= 0x7FFFFFFF;
  #ifdef DUMP
-                printf("CAN_frame: ID = 0x%8x DLC = %d\n", rxmsg.can_id, rxmsg.can_dlc);
+                printf("CAN_frame: ID = 0x%8x DLC = %d TS = %lld\n", rxmsg.can_id, rxmsg.can_dlc, GetMillis());
  #endif
                 // Manage the message in Slaves repo
                 ID = rxmsg.can_id;
