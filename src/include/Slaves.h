@@ -18,8 +18,16 @@
 #ifndef __SLAVES_H__
 #define __SLAVES_H__
 
-// Uncomment this to DUMP verbosely debug stuff on stdout
+// Uncomment this to DUMP debug stuff on stdout
 #define DUMP
+// Verbose deeper DUMP
+//#define VERBOSEDUMP
+#ifdef VERBOSEDUMP
+	#define DUMP
+#endif	// VERBOSEDUMP
+
+
+
 
 #define NUM_RELAYS         4
 
