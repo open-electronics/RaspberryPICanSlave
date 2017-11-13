@@ -202,13 +202,26 @@ function CreateSlave(Row, ID, Relays, TTE, SlaveIdx)
     UpdateAliveStuff(TTE, SlaveIdx, z);
 }
 
-function UpdateSlave(table, CANId, Row, Relays, TTE)
+function UpdateSlave(table, CANId, Row, Relays, TTE, SlaveIdx)
 {
    // Gets the children <td> from 1 -> Relays.length and update them text/colors
    for (i=0; i < Relays.length; i++)
 	  UpdateRelay(null, Relays[i], 0, i);
    
-   UpdateAliveStuff(TTE, 0, null);
+   UpdateAliveStuff(TTE, SlaveIdx, null);
+   
+   // Change the TD background when out of date (i.e. TTE < 0)
+   if (TTE < 0)
+   {
+	   for (i=0; i<Row.childNodes.length; ++i)
+		   Row.childNodes[i].style.backgroundColor = "LightGrey";
+   }
+   else
+   {
+	   // Just restore the first and the last TD, since the relays should have already the correct color
+	   Row.childNodes[0].style.backgroundColor = "transparent";
+	   Row.childNodes[5].style.backgroundColor = "transparent";
+   }
 }
 
 function AppendSlave(table, CANId, Relays, ExpireTS, SlaveIdx)
@@ -257,7 +270,7 @@ function ParseXML(xmlDoc)
 	      if (Row == null)
 	         AppendSlave(table, Id, Relays, ExpireTS, i);
 	      else
-	         UpdateSlave(table, Id, Row, Relays, ExpireTS);
+	         UpdateSlave(table, Id, Row, Relays, ExpireTS, i);
 	   }
    }
 }
