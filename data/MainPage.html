@@ -200,6 +200,42 @@ function CreateSlave(Row, ID, Relays, TTE, SlaveIdx)
 
    // Update the just created text
     UpdateAliveStuff(TTE, SlaveIdx, z);
+	
+	ManageSlaveEnabling(TTE, Row, SlaveIdx, Relays.length);
+}
+
+function DisableRelaysButtons(SlaveIdx, NumRelays, bDisable)
+{
+	var TD;
+	
+	for (i=0; i<NumRelays; ++i)
+	{
+		var Id = "S" + SlaveIdx + "C" + i;
+		TD = document.getElementById(Id);
+		TD.childNodes[0].disabled = bDisable;
+		TD.childNodes[2].disabled = bDisable;
+		TD.childNodes[4].disabled = bDisable;
+	}
+}
+
+function ManageSlaveEnabling(TTE, Row, SlaveIdx, NumRelays)
+{
+	// Change the TD background when out of date (i.e. TTE < 0)
+	if (TTE <0)
+	{
+		for (i=0; i<Row.childNodes.length; ++i)
+			Row.childNodes[i].style.backgroundColor = "LightGrey";
+		// Disable all relay buttons
+		DisableRelaysButtons(SlaveIdx, NumRelays, true);
+	}
+	else
+	{
+ 	   // Just restore the first and the last TD, since the relays should have already the correct color
+ 	   Row.childNodes[0].style.backgroundColor = "transparent";
+ 	   Row.childNodes[5].style.backgroundColor = "transparent";
+	   // Enable all relay buttons
+	   DisableRelaysButtons(SlaveIdx, NumRelays, false);
+    }
 }
 
 function UpdateSlave(table, CANId, Row, Relays, TTE, SlaveIdx)
@@ -210,18 +246,7 @@ function UpdateSlave(table, CANId, Row, Relays, TTE, SlaveIdx)
    
    UpdateAliveStuff(TTE, SlaveIdx, null);
    
-   // Change the TD background when out of date (i.e. TTE < 0)
-   if (TTE < 0)
-   {
-	   for (i=0; i<Row.childNodes.length; ++i)
-		   Row.childNodes[i].style.backgroundColor = "LightGrey";
-   }
-   else
-   {
-	   // Just restore the first and the last TD, since the relays should have already the correct color
-	   Row.childNodes[0].style.backgroundColor = "transparent";
-	   Row.childNodes[5].style.backgroundColor = "transparent";
-   }
+   ManageSlaveEnabling(TTE, Row, SlaveIdx, Relays.length);
 }
 
 function AppendSlave(table, CANId, Relays, ExpireTS, SlaveIdx)

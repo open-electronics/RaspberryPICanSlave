@@ -303,8 +303,8 @@ serve_simple_form (const void *cls,
 #define HAL1PORT		80		// 1st HAL ALWAYS uses this port by default	
 #define HALPORTBASE		50000	// from 2nd HAL going on, incremental ports from this value are used
 
-#define MAXTEXTFILELENGTH	8192
-#define BUFFERLENGTH		 256
+#define MAXTEXTFILELENGTH	16384
+#define BUFFERLENGTH		  256
 
 static char buffer[BUFFERLENGTH];
 
