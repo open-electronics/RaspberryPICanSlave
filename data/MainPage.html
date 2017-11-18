@@ -3,7 +3,7 @@
 <head>
 
    <style>
-      table, td {
+      table, td{
          border: 1px solid black;
       }
    </style>
@@ -44,23 +44,23 @@ function IncreaseFreqCount()
 	document.getElementById("fps").innerHTML=txt;
 }
 
-function chooseUser(entry, Idx)
+function chooseUser(entry, Idx, Id)
 {
     switch (entry)
     {
         case 1:
-            alert("Set" + Idx);
+            alert("Set " + Id + " " + Idx);
             break;
         case 2:
-            alert("Reset" + Idx);
+            alert("Reset " + Id + " " + Idx);
             break;
         case 3:
-            alert("Toggle" + Idx);
+            alert("Toggle " + Id + " " + Idx);
             break;
     }
 }
 
-function UpdateRelay(ExtTD, Value, SlaveIdx, Idx)
+function UpdateRelay(ExtTD, Value, Id, Idx)
 {
 	var TD;
 	// If an ExtTD is given, use it otherwise retrieve building its Id
@@ -68,7 +68,7 @@ function UpdateRelay(ExtTD, Value, SlaveIdx, Idx)
 		TD = ExtTD;
 	else
 	{
-		var Id = "S" + SlaveIdx + "C" + Idx;
+		var Id = "S" + Id + "C" + Idx;
 		TD = document.getElementById(Id);
 	}
 	if (TD != null) 
@@ -94,17 +94,17 @@ function UpdateRelay(ExtTD, Value, SlaveIdx, Idx)
 	}
 }
 
-function CreateRelay(Row, Idx, Value, SlaveIdx)
+function CreateRelay(Row, Idx, Value, Id)
 {
     var z = document.createElement("TD");
-	z.id = "S" + SlaveIdx + "C" + Idx;
+	z.id = "S" + Id + "C" + Idx;
 
     var btn = document.createElement('input');
     btn.type = "button";
     btn.className = "btn";
     btn.style.width = "100%";
     btn.value = "Set";
-    btn.onclick = (function(entry, Idx) {return function() {chooseUser(entry, Idx);}})(1, Idx);
+    btn.onclick = (function(entry, Idx) {return function() {chooseUser(entry, Idx, Id);}})(1, Idx, Id);
 
     z.appendChild(btn);
     var br = document.createElement("br");
@@ -114,7 +114,7 @@ function CreateRelay(Row, Idx, Value, SlaveIdx)
     btn.className = "btn";
     btn.style.width = "100%";
     btn.value = "Reset";
-    btn.onclick = (function(entry, Idx) {return function() {chooseUser(entry, Idx);}})(2, Idx);
+    btn.onclick = (function(entry, Idx) {return function() {chooseUser(entry, Idx, Id);}})(2, Idx, Id);
     z.appendChild(btn);
      var br = document.createElement("br");
     z.appendChild(br);
@@ -123,18 +123,18 @@ function CreateRelay(Row, Idx, Value, SlaveIdx)
     btn.className = "btn";
     btn.style.width = "100%";
     btn.value = "Toggle";
-    btn.onclick = (function(entry, Idx) {return function() {chooseUser(entry, Idx);}})(3, Idx);
+    btn.onclick = (function(entry, Idx) {return function() {chooseUser(entry, Idx, Id);}})(3, Idx, Id);
     z.appendChild(btn);
     var br = document.createElement("br");
     z.appendChild(br);
 
 	// Update the cell text value and background color
-	UpdateRelay(z, Value, SlaveIdx, Idx);
+	UpdateRelay(z, Value, Id, Idx);
 
     Row.appendChild(z);
 }
 
-function UpdateAliveStuff(TTE, SlaveIdx, ExtTD)
+function UpdateAliveStuff(TTE, Id, ExtTD)
 {
 	var TD;
 		
@@ -142,7 +142,7 @@ function UpdateAliveStuff(TTE, SlaveIdx, ExtTD)
 	if(ExtTD != null)
 		TD = ExtTD;
 	else
-		TD = document.getElementById("S" + SlaveIdx + "C5");
+		TD = document.getElementById("S" + Id + "C5");
    if (TD != null)
    {	   
 	  // The first TD child is a label, and its first child it's the "Alive" text
@@ -169,7 +169,7 @@ function UpdateAliveStuff(TTE, SlaveIdx, ExtTD)
 	}
 }
 
-function CreateSlave(Row, ID, Relays, TTE, SlaveIdx)
+function CreateSlave(Row, ID, Relays, TTE)
 {
     // Create a cell for the Slave ID
     var z = document.createElement("TD");
@@ -179,12 +179,12 @@ function CreateSlave(Row, ID, Relays, TTE, SlaveIdx)
 
     // Create the relays cells
     for (i = 0; i < Relays.length; i++)
-        CreateRelay(Row, i, Relays[i], SlaveIdx);
+        CreateRelay(Row, i, Relays[i], ID);
 
    // Create the Slave Status
     var z = document.createElement("TD");
 	// Tag the last column (5, 0-based) of this row
-	z.id = "S" + SlaveIdx + "C5";
+	z.id = "S" + ID + "C5";
     Row.appendChild(z);
     var label = document.createElement('label');
 	var t = document.createTextNode("String");
@@ -199,18 +199,18 @@ function CreateSlave(Row, ID, Relays, TTE, SlaveIdx)
     z.appendChild(t);
 
    // Update the just created text
-    UpdateAliveStuff(TTE, SlaveIdx, z);
+    UpdateAliveStuff(TTE, ID, z);
 	
-	ManageSlaveEnabling(TTE, Row, SlaveIdx, Relays.length);
+	ManageSlaveEnabling(TTE, Row, ID, Relays.length);
 }
 
-function DisableRelaysButtons(SlaveIdx, NumRelays, bDisable)
+function DisableRelaysButtons(SlaveId, NumRelays, bDisable)
 {
 	var TD;
 	
 	for (i=0; i<NumRelays; ++i)
 	{
-		var Id = "S" + SlaveIdx + "C" + i;
+		var Id = "S" + SlaveId + "C" + i;
 		TD = document.getElementById(Id);
 		TD.childNodes[0].disabled = bDisable;
 		TD.childNodes[2].disabled = bDisable;
@@ -218,15 +218,15 @@ function DisableRelaysButtons(SlaveIdx, NumRelays, bDisable)
 	}
 }
 
-function ManageSlaveEnabling(TTE, Row, SlaveIdx, NumRelays)
+function ManageSlaveEnabling(TTE, Row, Id, NumRelays)
 {
 	// Change the TD background when out of date (i.e. TTE < 0)
-	if (TTE <0)
+	if (TTE < 0)
 	{
 		for (i=0; i<Row.childNodes.length; ++i)
 			Row.childNodes[i].style.backgroundColor = "LightGrey";
 		// Disable all relay buttons
-		DisableRelaysButtons(SlaveIdx, NumRelays, true);
+		DisableRelaysButtons(Id, NumRelays, true);
 	}
 	else
 	{
@@ -234,22 +234,22 @@ function ManageSlaveEnabling(TTE, Row, SlaveIdx, NumRelays)
  	   Row.childNodes[0].style.backgroundColor = "transparent";
  	   Row.childNodes[5].style.backgroundColor = "transparent";
 	   // Enable all relay buttons
-	   DisableRelaysButtons(SlaveIdx, NumRelays, false);
+	   DisableRelaysButtons(Id, NumRelays, false);
     }
 }
 
-function UpdateSlave(table, CANId, Row, Relays, TTE, SlaveIdx)
+function UpdateSlave(table, CANId, Row, Relays, TTE)
 {
    // Gets the children <td> from 1 -> Relays.length and update them text/colors
    for (i=0; i < Relays.length; i++)
-	  UpdateRelay(null, Relays[i], 0, i);
+	  UpdateRelay(null, Relays[i], CANId, i);
    
-   UpdateAliveStuff(TTE, SlaveIdx, null);
+   UpdateAliveStuff(TTE, CANId, null);
    
-   ManageSlaveEnabling(TTE, Row, SlaveIdx, Relays.length);
+   ManageSlaveEnabling(TTE, Row, CANId, Relays.length);
 }
 
-function AppendSlave(table, CANId, Relays, ExpireTS, SlaveIdx)
+function AppendSlave(table, CANId, Relays, ExpireTS)
 {
 	table.innerHTML = "";
 
@@ -261,7 +261,7 @@ function AppendSlave(table, CANId, Relays, ExpireTS, SlaveIdx)
 
    table.appendChild(Row);
 
-   CreateSlave(Row, CANId, Relays, ExpireTS, SlaveIdx);
+   CreateSlave(Row, CANId, Relays, ExpireTS);
 }
 
 function ParseXML(xmlDoc)
@@ -293,9 +293,9 @@ function ParseXML(xmlDoc)
 	      // Search if there's an existing matching Id row in the HTML
 	      Row = document.getElementById(Id);
 	      if (Row == null)
-	         AppendSlave(table, Id, Relays, ExpireTS, i);
+	         AppendSlave(table, Id, Relays, ExpireTS);
 	      else
-	         UpdateSlave(table, Id, Row, Relays, ExpireTS, i);
+	         UpdateSlave(table, Id, Row, Relays, ExpireTS);
 	   }
    }
 }
