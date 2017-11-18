@@ -2,12 +2,6 @@
 <html>
 <head>
 
-   <style>
-      table, td{
-         border: 1px solid black;
-      }
-   </style>
-
    <script>
 
    function getXmlHttpRequestObject()
@@ -251,7 +245,7 @@ function UpdateSlave(table, CANId, Row, Relays, TTE)
 
 function AppendSlave(table, CANId, Relays, ExpireTS)
 {
-	table.innerHTML = "";
+	//table.innerHTML = "";
 
 	var Row = document.createElement("TR");
    // Assign an Id to the row == CANId. This will be used ti check
@@ -264,21 +258,51 @@ function AppendSlave(table, CANId, Relays, ExpireTS)
    CreateSlave(Row, CANId, Relays, ExpireTS);
 }
 
+function GetTable()
+{
+	var table;
+    var Item = document.getElementById('MasterTable');
+    // If the table is empty, let's add at the table header
+    if ( Item.childNodes.length == 0)
+    {
+ 	   table = document.createElement("TABLE");
+ 	   table.border = 1;
+ 	   Item.appendChild(table);
+ 	   var Row = document.createElement("TR");
+ 	   table.appendChild(Row);
+        var TH1 = document.createElement("TH");
+        Row.appendChild(TH1);
+ 	   var L1 = document.createTextNode("CAN Id");
+ 	   TH1.appendChild(L1);
+ 	   for (i = 0; i < 4; i++)
+ 	   {
+ 	       var TH = document.createElement("TH");
+ 	       Row.appendChild(TH);
+ 		   var L = document.createTextNode("Relay " + i);
+ 		   TH.appendChild(L);	   	
+ 	   }
+        var TH2 = document.createElement("TH");
+        Row.appendChild(TH2);
+ 	   var L2 = document.createTextNode("Status");
+ 	   TH2.appendChild(L2);
+    }
+    else
+ 	   table = Item.childNodes[0];
+	return table;
+}
+
 function ParseXML(xmlDoc)
 {
    if (xmlDoc == null)
       return;
    // Fill the main table
    x = xmlDoc.getElementsByTagName("Slave");
-   var table = document.getElementById('MasterTable');
+ 
+   // Returns a handle to the MasterTable
+   var table = GetTable(table);
+
    //Check if the Slaves list is empty
-   if (x.length == 0)
-   {
-      txt = txt + "<tr>";
-      txt = txt + "<td>" + "No Slaves present on the CAN Bus" + "</td>";
-      txt = txt + "</tr>";
-   }
-   else
+   if (x.length != 0)
    {
 	   var Id, Row, ExpireTS, Relays = [];
 
@@ -332,9 +356,9 @@ function getRequest(resource, command, handleResponse)
 </head>
 <body>
 
-   <div id='MasterTable'></div><br>
-   <div id='frames'></div><br>
-   <div id='fps'></div><br>
+ <div id='MasterTable'></div><br>
+ <div id='frames'></div><br>
+ <div id='fps'></div><br>
 
 </body>
 </html>
