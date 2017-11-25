@@ -38,8 +38,15 @@ function IncreaseFreqCount()
 	document.getElementById("fps").innerHTML=txt;
 }
 
+function getRequestRelay(SlaveId, RelayIdx, Command)
+{
+	getRequest('/data/SnapShot.xml', 'S'+SlaveId+'R'+RelayIdx+'C'+Command, handleResponse);
+}
+
 function chooseUser(entry, Idx, Id)
 {
+	getRequestRelay(Id, Idx, entry);
+/*	
     switch (entry)
     {
         case 1:
@@ -51,7 +58,7 @@ function chooseUser(entry, Idx, Id)
         case 3:
             alert("Toggle " + Id + " " + Idx);
             break;
-    }
+    }*/
 }
 
 function UpdateRelay(ExtTD, Value, Id, Idx)
@@ -195,7 +202,7 @@ function CreateSlave(Row, ID, Relays, TTE)
    // Update the just created text
     UpdateAliveStuff(TTE, ID, z);
 	
-	ManageSlaveEnabling(TTE, Row, ID, Relays.length);
+	//ManageSlaveEnabling(TTE, Row, ID, Relays.length);
 }
 
 function DisableRelaysButtons(SlaveId, NumRelays, bDisable)
@@ -240,7 +247,7 @@ function UpdateSlave(table, CANId, Row, Relays, TTE)
    
    UpdateAliveStuff(TTE, CANId, null);
    
-   ManageSlaveEnabling(TTE, Row, CANId, Relays.length);
+   //ManageSlaveEnabling(TTE, Row, CANId, Relays.length);
 }
 
 function AppendSlave(table, CANId, Relays, ExpireTS)
@@ -335,6 +342,7 @@ function handleResponse()
 function getRequestRefresh()
  {
 	 getRequest('/data/SnapShot.xml', 'Refresh', handleResponse);
+	 //clearInterval(SnapShotInterval);
  }
 function getRequest(resource, command, handleResponse)
  {

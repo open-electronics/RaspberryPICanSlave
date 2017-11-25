@@ -42,6 +42,8 @@ void CommandDispatcher(const char **ppXMLSnapShot, const char Cmd[])
    // not in multithreaded mode, so each connection is served sequentially by a queue
    // but we leave it here to support the webserver in multithreaded mode
    pthread_mutex_lock(&sCmdMutex);
+   
+   printf("%s\n", Cmd);
 
    // Switch among commands:
    //
