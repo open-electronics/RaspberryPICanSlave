@@ -384,8 +384,9 @@ serveSnapShotXML (const void *cls,
    int    ret;
 
    const char *pCmd = MHD_lookup_connection_value(connection, MHD_GET_ARGUMENT_KIND, "Cmd");
+   const char *pPayload = MHD_lookup_connection_value(connection, MHD_GET_ARGUMENT_KIND, "PL");
 #ifdef DUMP
-//   printf("Cmd = %s\n", pCmd);
+//      printf("Cmd = %s %s\n", pCmd, pPayload);
 #endif
 
    // The XML is filled up by the CommandDispatcher using a static string object.
@@ -393,7 +394,7 @@ serveSnapShotXML (const void *cls,
    // extract a char point from it
    const char *pString;
    // Dispatch the command
-   CommandDispatcher(&pString, pCmd);
+   CommandDispatcher(&pString, pCmd, pPayload);
 
    /* return static form */
    response = MHD_create_response_from_buffer(strlen(pString), (void *)pString, MHD_RESPMEM_PERSISTENT);

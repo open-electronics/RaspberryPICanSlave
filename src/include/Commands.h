@@ -26,7 +26,7 @@ extern "C" {
 
    void CommandInit(void);
    void CommandQuit(void);
-   void CommandDispatcher(const char **ppXMLSnapShot, const char Cmd[]);
+   void CommandDispatcher(const char **ppXMLSnapShot, const char Cmd[], const char *pPayLoad);
 
 
 // Decoration to let C++ code be used from within plain C modules

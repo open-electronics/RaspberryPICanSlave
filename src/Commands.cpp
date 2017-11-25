@@ -36,14 +36,14 @@ void CommandQuit(void)
 }
 
 
-void CommandDispatcher(const char **ppXMLSnapShot, const char Cmd[])
+void CommandDispatcher(const char **ppXMLSnapShot, const char Cmd[], const char *pPayLoad)
 {
    // These mutex could be avoided, since we are using the microwebserver
    // not in multithreaded mode, so each connection is served sequentially by a queue
    // but we leave it here to support the webserver in multithreaded mode
    pthread_mutex_lock(&sCmdMutex);
    
-   printf("%s\n", Cmd);
+   //printf("%s\n", Cmd);
 
    // Switch among commands:
    //
