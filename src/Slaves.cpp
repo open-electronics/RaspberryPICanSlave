@@ -86,7 +86,7 @@ public:
 
 
 typedef map<int, CSlaveValue> SlavesMapType;
-typedef SlavesMapType::iterator SlavesIterator;
+
 
 // Slaves map repository, indexed by the CAN ID as int
 static SlavesMapType SlavesMap;
@@ -122,7 +122,7 @@ void Slave_Update_CTRL_ID(const int CTRL_ID, const int ID)
 {
    pthread_mutex_lock(&sMutex);
    // The Slave repo is not empty so far. Let's find a given ID match
-   SlavesIterator it = SlavesMap.find(ID);
+   auto it = SlavesMap.find(ID);
    if (it != SlavesMap.end())
       it->second.SetCTRL_ID(CTRL_ID);
    else
@@ -138,7 +138,7 @@ void Slave_Update_Relays_And_TimeStamp(const byte Relays[], const __int64 TimeSt
 {
    pthread_mutex_lock(&sMutex);
    // The Slave repo is not empty so far. Let's find a given ID match
-   SlavesIterator it = SlavesMap.find(ID);
+   auto it = SlavesMap.find(ID);
    if (it != SlavesMap.end())
    {
       it->second.SetRelays(Relays);
@@ -158,7 +158,7 @@ void Slave_Update_ExpireTS(const __int64 ExpireTS, const int ID)
 {
    pthread_mutex_lock(&sMutex);
    // The Slave repo is not empty so far. Let's find a given ID match
-   SlavesIterator it = SlavesMap.find(ID);
+   auto it = SlavesMap.find(ID);
    if (it != SlavesMap.end())
       it->second.SetExpireTS(ExpireTS);
    else
@@ -190,9 +190,38 @@ int SlaveGetFirstID(void)
 
 int SlaveUpdateRelay(int *pCANCTRLId, byte Relays[], const int Id, const int Relay, const int Cmd)
 {
-
-
-	return 0x00;
+	int ret = 0x00;
+	
+	pthread_mutex_lock(&sMutex);
+	// Search the needed Id exists in the repo
+    auto it = SlavesMap.find(Id);
+    if (it != SlavesMap.end())
+	{
+		// To send a message, this Slave must have a valid CTRL Id
+		*pCANCTRLId = it->second.GetCTRL_ID();
+		if (*pCANCTRLId)
+		{
+			memcpy(Relays, it->second.GetRelays(), NUM_RELAYS*sizeof(byte));
+			if (Relay >=0 && Relay<=NUM_RELAYS && Cmd >= 1 && Cmd <= 3)
+			{
+				switch (Cmd)
+				{
+					case 1:    // Set
+						Relays[Relay] = 0x01;
+					break;
+					case 2:    // Reset
+						Relays[Relay] = 0x00;
+					break;
+					case 3:    // Toggle
+					Relays[Relay] = Relays[Relay] ? 0x00 : 0x01;
+					break;
+				}
+				ret = 0x01;
+			}
+		}
+	}
+	pthread_mutex_unlock(&sMutex);
+	return ret;
 }
 
 void Slave_DUMPSlavesForDebug(void)

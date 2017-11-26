@@ -54,7 +54,7 @@ static void CommandRelay(const char *pId, const char *pR, const char *pC)
 	int Relay = atoi(pR);
 	int Cmd = atoi(pC);
 	
-	byte PayLoad[29];
+	byte PayLoad[NUM_RELAYS];
 	int  CANCTRLId;
 	
 	// Apply the command and retrieve the CTRL Id and the PayLoad to be sent by CAN
