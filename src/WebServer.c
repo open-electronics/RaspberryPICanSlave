@@ -384,7 +384,9 @@ serveSnapShotXML (const void *cls,
    int    ret;
 
    const char *pCmd = MHD_lookup_connection_value(connection, MHD_GET_ARGUMENT_KIND, "Cmd");
-   const char *pPayload = MHD_lookup_connection_value(connection, MHD_GET_ARGUMENT_KIND, "PL");
+   const char *pId = MHD_lookup_connection_value(connection, MHD_GET_ARGUMENT_KIND, "Id");
+   const char *pRelay = MHD_lookup_connection_value(connection, MHD_GET_ARGUMENT_KIND, "R");
+   const char *pC = MHD_lookup_connection_value(connection, MHD_GET_ARGUMENT_KIND, "C");
 #ifdef DUMP
 //      printf("Cmd = %s %s\n", pCmd, pPayload);
 #endif
@@ -394,7 +396,7 @@ serveSnapShotXML (const void *cls,
    // extract a char point from it
    const char *pString;
    // Dispatch the command
-   CommandDispatcher(&pString, pCmd, pPayload);
+   CommandDispatcher(&pString, pCmd, pId, pRelay, pC);
 
    /* return static form */
    response = MHD_create_response_from_buffer(strlen(pString), (void *)pString, MHD_RESPMEM_PERSISTENT);

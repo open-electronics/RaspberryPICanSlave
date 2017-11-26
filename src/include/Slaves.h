@@ -54,8 +54,9 @@ void Slave_Update_CTRL_ID			(const int CTRL_ID, const int ID);
 void Slave_Update_Relays_And_TimeStamp(const byte Relays[], const __int64 TimeStamp, const int ID, const byte bAdd);
 void Slave_Update_ExpireTS			(const __int64 ExpireTS, const int ID);
 int  SlaveGetFirstID				(void);
+int  SlaveUpdateRelay				(int *pCANCTRLId, byte Relays[], const int Id, const int Relay, const int Cmd);
 void Slave_DUMPSlavesForDebug		(void);
-void GetSlavesXMLSnapShot        (const char **ppXMLSnapShot);
+void GetSlavesXMLSnapShot        	(const char **ppXMLSnapShot);
 
 
 // Decoration to let C++ code be used from within plain C modules

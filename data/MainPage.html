@@ -40,7 +40,7 @@ function IncreaseFreqCount()
 
 function getRequestRelay(SlaveId, RelayIdx, Command)
 {
-	getRequest('/data/SnapShot.xml', 'Relay&PL='+SlaveId+'R'+RelayIdx+'C'+Command, handleResponse);
+	getRequest('/data/SnapShot.xml', 'Relay&Id='+SlaveId+'&R='+RelayIdx+'&C='+Command, handleResponse);
 }
 
 function chooseUser(entry, Idx, Id)

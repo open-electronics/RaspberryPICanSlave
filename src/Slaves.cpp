@@ -188,6 +188,13 @@ int SlaveGetFirstID(void)
 	return ret;
 }
 
+int SlaveUpdateRelay(int *pCANCTRLId, byte Relays[], const int Id, const int Relay, const int Cmd)
+{
+
+
+	return 0x00;
+}
+
 void Slave_DUMPSlavesForDebug(void)
 {
    pthread_mutex_lock(&sMutex);
