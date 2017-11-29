@@ -21,6 +21,7 @@
 #include <pthread.h>
 #include <Commands.h>
 #include <Slaves.h>
+#include <CANRx.h>
 
 // Mutex which protects the commands 
 static pthread_mutex_t sCmdMutex;
@@ -59,10 +60,8 @@ static void CommandRelay(const char *pId, const char *pR, const char *pC)
 	
 	// Apply the command and retrieve the CTRL Id and the PayLoad to be sent by CAN
 	if (SlaveUpdateRelay(&CANCTRLId, PayLoad, Id, Relay, Cmd))
-	{
 		// Send the CTRL message by CAN, updating the slave
-		
-	}
+		SendCANMsg(CANCTRLId, PayLoad, NUM_RELAYS);
 }
 
 void CommandDispatcher(const char **ppXMLSnapShot, const char Cmd[], const char *pId, const char *pR, const char *pC)

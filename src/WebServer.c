@@ -791,7 +791,7 @@ int main (int argc, char *const *argv)
   // Read the CANSlave.cfg configuration file
   LoadCfgFile("./data/CANSlave.cfg");
   // Start the CAN listener thread
-  StartCANRxThread();
+  InitCANBus();
   // Init the commands stuff
   CommandInit();
   

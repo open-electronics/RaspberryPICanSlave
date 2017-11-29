@@ -19,8 +19,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <pthread.h>
-#include <CANRx.h>
 #include <Slaves.h>
+#include <CANRx.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
 #include <net/if.h>
@@ -120,10 +120,85 @@ static void* CANRxThreadCbk(void *pPtr)
 
 // Start a thread which listen to CAN Rx frames. All rx reads are blocking
 // in order to keep thread in sleep mode until a CAN message is reiceived.
-int StartCANRxThread(void)
+static int StartCANRxThread(void)
 {
 	pthread_t Thread;
 	
 	// Gives current hid_device* as thread cbk parameter
 	return pthread_create(&Thread, NULL, CANRxThreadCbk, nullptr);
 }
+
+#ifdef __linux__	
+static int iSendSocket = 0;
+#endif
+
+static bool InitCANTxMainThread(void)
+{
+#ifdef __linux__	
+    sockaddr_can addr;
+    ifreq        ifr;
+
+    const char *ifname = "vcan0";
+
+    memset(&ifr, 0x00, sizeof(ifr));
+    memset(&addr, 0x00, sizeof(addr));
+
+    // Open CAN_RAW socket
+    if ((iSendSocket = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) 
+    {
+       printf("Error while opening socket!!!\n");
+       return false;
+    } 
+
+    // Convert the interface string "can0" into interface index
+    strcpy(ifr.ifr_name, ifname);
+    ioctl(iSendSocket, SIOCGIFINDEX, &ifr);
+    // Prepare the address for the binding
+    addr.can_family = PF_CAN;
+    addr.can_ifindex = ifr.ifr_ifindex;
+
+    // Bind the socket to the can0 interface
+    if (bind(iSendSocket, (struct sockaddr *)&addr, sizeof(addr)) < 0)
+    {
+       perror("Error in send socket binding!!!\n");
+       return false;
+    }	
+#endif
+	
+	return true;
+}
+
+int SendCANMsg(const int CANId, const byte PayLoad[], const int PayLoadSize)
+{
+#ifdef __linux__
+	can_frame	msg;
+	
+	msg.can_id = CANId;
+	memcpy(&msg.data, PayLoad, PayLoadSize);
+	msg.can_dlc = PayLoadSise;
+	
+	write(iSendSocket, &msg, sizeof(msg));
+		
+#endif
+	return true;
+}
+
+int InitCANBus(void)
+{
+	// Start the CANRxThread
+	if (!StartCANRxThread())
+		return false;
+	// Start and init the CANTx socket, running in the main thread
+	return InitCANTxMainThread();
+}
+
+
+
+
+
+
+
+
+
+
+

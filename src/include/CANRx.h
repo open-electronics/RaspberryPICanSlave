@@ -24,8 +24,9 @@ extern "C" {
 #endif
 	
 
-int StartCANRxThread(void);
-	
+int InitCANBus(void);
+int SendCANMsg(const int CANId, const byte PayLoad[], const int PayLoadSize);
+
 	
 // Decoration to let C++ code be used from within plain C modules
 #ifdef __cplusplus
