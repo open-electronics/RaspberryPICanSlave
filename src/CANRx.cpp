@@ -180,7 +180,7 @@ int SendCANMsg(const int CANId, const byte PayLoad[], const int PayLoadSize)
 	
 	msg.can_id = CANId;
 	// Set rightmost bit to tell this is an extended CANFrame
-	msg.can_id |= 0x1000000;
+	msg.can_id |= 0x10000000;
 	memcpy(&msg.data, PayLoad, CAN_MSG_LEN);
 	msg.can_dlc = CAN_MSG_LEN;
 	
