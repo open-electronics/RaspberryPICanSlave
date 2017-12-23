@@ -156,7 +156,7 @@ static bool InitCANTxMainThread(void)
     strcpy(ifr.ifr_name, ifname);
     ioctl(iSendSocket, SIOCGIFINDEX, &ifr);
     // Prepare the address for the binding
-    addr.can_family = PF_CAN;
+    addr.can_family = AF_CAN;
     addr.can_ifindex = ifr.ifr_ifindex;
 
     // Bind the socket to the can0 interface
