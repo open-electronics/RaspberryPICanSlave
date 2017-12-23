@@ -177,6 +177,13 @@ int SendCANMsg(const int CANId, const byte PayLoad[], const int PayLoadSize)
 	memcpy(&msg.data, PayLoad, PayLoadSize);
 	msg.can_dlc = 8;
 	
+#ifdef DUMP
+	printf("Sent CANID %d", CANId);
+	for (i=0 ; i<msg.can_dlc; i++)
+		printf("%x2 ", Payload[i]);
+	printf("\n");
+#endif
+	
 	write(iSendSocket, &msg, sizeof(msg));
 		
 #endif
