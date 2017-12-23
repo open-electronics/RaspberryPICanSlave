@@ -32,6 +32,8 @@
 #endif // __linux__
 
 
+#define CAN_MSG_LEN					8
+
 // CANRx thread callback
 static void* CANRxThreadCbk(void *pPtr)
 {
@@ -173,12 +175,15 @@ int SendCANMsg(const int CANId, const byte PayLoad[], const int PayLoadSize)
 #ifdef __linux__
 	can_frame	msg;
 	
+	// Reset the data array
+	memset(&msg.data, 0x00, CAN_MSG_LEN);
+	
 	msg.can_id = CANId;
 	memcpy(&msg.data, PayLoad, PayLoadSize);
 	msg.can_dlc = 8;
 	
 #ifdef DUMP
-	printf("SENT CAN_frame: ID = 0x%8x DLC = %d\n", msg.can_id, msg.can_dlc);
+	printf("SENT CAN_frame: ID = 0x%8x DLC = %d. Socket = %d\n", msg.can_id, msg.can_dlc, iSendSocket);
 	for (int i=0 ; i<msg.can_dlc; i++)
 		printf("%d ", msg.data[i]);
 	printf("\n");
