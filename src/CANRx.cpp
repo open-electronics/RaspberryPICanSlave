@@ -194,7 +194,7 @@ int SendCANMsg(const int CANId, const byte PayLoad[], const int PayLoadSize)
 	int nBytes = write(iSendSocket, &msg, sizeof(msg));
 	
 #ifdef DUMP
-	printf("Number of written bytes: %d\n");
+	printf("Number of written bytes: %d\n", nBytes);
 #endif
 		
 #endif
