@@ -92,7 +92,7 @@ static void* CANRxThreadCbk(void *pPtr)
 				 rxmsg.can_id &= 0x7FFFFFFF;
  #ifdef DUMP
 				 static __int64 LastTS = 0;
-                printf("CAN_frame: ID = 0x%8x DLC = %d TS = %lld\n", rxmsg.can_id, rxmsg.can_dlc, GetMillis()-LastTS);
+                printf("RCVD CAN_frame: ID = 0x%8x DLC = %d TS = %lld\n", rxmsg.can_id, rxmsg.can_dlc, GetMillis()-LastTS);
 				LastTS = GetMillis();
  #endif
                 // Manage the message in Slaves repo
@@ -178,9 +178,9 @@ int SendCANMsg(const int CANId, const byte PayLoad[], const int PayLoadSize)
 	msg.can_dlc = 8;
 	
 #ifdef DUMP
-	printf("Sent CANID %d", CANId);
-	for (auto i=0 ; i<msg.can_dlc; i++)
-		printf("%x2 ", PayLoad[i]);
+	printf("SENT CAN_frame: ID = 0x%8x DLC = %d\n", msg.can_id, msg.can_dlc;
+	for (int i=0 ; i<msg.can_dlc; i++)
+		printf("%d ", msg.dta[i]);
 	printf("\n");
 #endif
 	
