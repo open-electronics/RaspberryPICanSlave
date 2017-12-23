@@ -178,9 +178,9 @@ int SendCANMsg(const int CANId, const byte PayLoad[], const int PayLoadSize)
 	msg.can_dlc = 8;
 	
 #ifdef DUMP
-	printf("SENT CAN_frame: ID = 0x%8x DLC = %d\n", msg.can_id, msg.can_dlc;
+	printf("SENT CAN_frame: ID = 0x%8x DLC = %d\n", msg.can_id, msg.can_dlc);
 	for (int i=0 ; i<msg.can_dlc; i++)
-		printf("%d ", msg.dta[i]);
+		printf("%d ", msg.data[i]);
 	printf("\n");
 #endif
 	
