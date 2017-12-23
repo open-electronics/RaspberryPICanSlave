@@ -176,7 +176,7 @@ int SendCANMsg(const int CANId, const byte PayLoad[], const int PayLoadSize)
 	can_frame	msg;
 	
 	// Reset the data array
-	memset(&msg.data, 0x00, CAN_MSG_LEN);
+	memset(&msg, 0x00, sizeof(msg);
 	
 	msg.can_id = CANId;
 	memcpy(&msg.data, PayLoad, PayLoadSize);
