@@ -180,7 +180,7 @@ int SendCANMsg(const int CANId, const byte PayLoad[], const int PayLoadSize)
 #ifdef DUMP
 	printf("Sent CANID %d", CANId);
 	for (i=0 ; i<msg.can_dlc; i++)
-		printf("%x2 ", Payload[i]);
+		printf("%x2 ", PayLoad[i]);
 	printf("\n");
 #endif
 	
