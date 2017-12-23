@@ -183,13 +183,17 @@ int SendCANMsg(const int CANId, const byte PayLoad[], const int PayLoadSize)
 	msg.can_dlc = 8;
 	
 #ifdef DUMP
-	printf("SENT CAN_frame: ID = 0x%8x DLC = %d. Socket = %d\n", msg.can_id, msg.can_dlc, iSendSocket);
+	printf("SENT CAN_frame: ID = 0x%8x DLC = %d. Socket = %d: ", msg.can_id, msg.can_dlc, iSendSocket);
 	for (int i=0 ; i<msg.can_dlc; i++)
 		printf("%d ", msg.data[i]);
 	printf("\n");
 #endif
 	
-	write(iSendSocket, &msg, sizeof(msg));
+	int nBytes = write(iSendSocket, &msg, sizeof(msg));
+	
+#ifdef DUMP
+	printf("Number of written bytes: %d\n", nBytes);
+#endif
 		
 #endif
 	return true;
