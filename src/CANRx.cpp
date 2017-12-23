@@ -175,7 +175,7 @@ int SendCANMsg(const int CANId, const byte PayLoad[], const int PayLoadSize)
 	
 	msg.can_id = CANId;
 	memcpy(&msg.data, PayLoad, PayLoadSize);
-	msg.can_dlc = PayLoadSize;
+	msg.can_dlc = 8;
 	
 	write(iSendSocket, &msg, sizeof(msg));
 		
