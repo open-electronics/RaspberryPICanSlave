@@ -49,7 +49,7 @@ static void* CANRxThreadCbk(void *pPtr)
     ifreq        ifr;
     int          sd, ID;
 
-    const char *ifname = "vcan0";
+    const char *ifname = "can0"; //"vcan0";
 
     memset(&ifr, 0x00, sizeof(ifr));
     memset(&addr, 0x00, sizeof(addr));
@@ -205,11 +205,11 @@ int SendCANMsg(const int CANId, const byte PayLoad[], const int PayLoadSize)
 
 int InitCANBus(void)
 {
-	// Start the CANRxThread
-	if (!StartCANRxThread())
-		return false;
 	// Start and init the CANTx socket, running in the main thread
-	return InitCANTxMainThread();
+	if (!InitCANTxMainThread())
+		return false;
+	// Start the CANRxThread
+	return StartCANRxThread();
 }
 
 
