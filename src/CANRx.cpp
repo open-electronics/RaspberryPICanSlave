@@ -175,7 +175,7 @@ static bool InitCANTxMainThread(void)
 int SendCANMsg(const int CANId, const byte PayLoad[], const int PayLoadSize)
 {
 #ifdef __linux__
-	can_frame	msg;
+	struct can_frame	msg;
 	
 	// Reset the data array
 	memset(&msg, 0x00, sizeof(msg));
