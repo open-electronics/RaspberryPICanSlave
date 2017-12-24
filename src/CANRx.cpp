@@ -136,7 +136,9 @@ static int iSendSocket = 0;
 
 static bool InitCANTxMainThread(void)
 {
-#ifdef __linux__	
+#ifdef __linux__
+#define OLDSEND	
+#ifdef OLDSEND
     sockaddr_can addr;
     ifreq        ifr;
 
@@ -165,6 +167,7 @@ static bool InitCANTxMainThread(void)
        perror("Error in send socket binding!!!\n");
        return false;
     }	
+#endif
 #endif
 	
 	return true;
