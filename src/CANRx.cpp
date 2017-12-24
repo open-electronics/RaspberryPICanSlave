@@ -137,12 +137,11 @@ static int iSendSocket = 0;
 static bool InitCANTxMainThread(void)
 {
 #ifdef __linux__
-#define OLDSEND	
-#ifdef OLDSEND
     sockaddr_can addr;
     ifreq        ifr;
 
-    const char *ifname = "vcan0";
+	// WARNING: use "can0" here, since "vcan0" would not work
+    const char *ifname = "can0";
 
     memset(&ifr, 0x00, sizeof(ifr));
     memset(&addr, 0x00, sizeof(addr));
@@ -167,7 +166,7 @@ static bool InitCANTxMainThread(void)
        perror("Error in send socket binding!!!\n");
        return false;
     }	
-#endif
+	
 #endif
 	
 	return true;
@@ -194,8 +193,7 @@ int SendCANMsg(const int CANId, const byte PayLoad[], const int PayLoadSize)
 	printf("\n");
 #endif
 	
-	int nBytes = 0;
-	// = write(iSendSocket, &msg, sizeof(msg));
+	int nBytes = write(iSendSocket, &msg, sizeof(msg));
 	
 #ifdef DUMP
 	printf("Number of written bytes: %d\n", nBytes);
