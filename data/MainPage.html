@@ -202,7 +202,7 @@ function CreateSlave(Row, ID, Relays, TTE)
    // Update the just created text
     UpdateAliveStuff(TTE, ID, z);
 	
-	//ManageSlaveEnabling(TTE, Row, ID, Relays.length);
+	ManageSlaveEnabling(TTE, Row, ID, Relays.length);
 }
 
 function DisableRelaysButtons(SlaveId, NumRelays, bDisable)
@@ -247,7 +247,7 @@ function UpdateSlave(table, CANId, Row, Relays, TTE)
    
    UpdateAliveStuff(TTE, CANId, null);
    
-   //ManageSlaveEnabling(TTE, Row, CANId, Relays.length);
+   ManageSlaveEnabling(TTE, Row, CANId, Relays.length);
 }
 
 function AppendSlave(table, CANId, Relays, ExpireTS)
