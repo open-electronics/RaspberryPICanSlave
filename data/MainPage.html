@@ -241,6 +241,7 @@ function ManageSlaveEnabling(TTE, Row, Id, NumRelays)
 
 function UpdateSlave(table, CANId, Row, Relays, TTE)
 {
+	console.log("Update" + CANId + " " + Row + " " + TTE);
    // Gets the children <td> from 1 -> Relays.length and update them text/colors
    for (i=0; i < Relays.length; i++)
 	  UpdateRelay(null, Relays[i], CANId, i);
