@@ -180,7 +180,7 @@ void LoadCfgFile(const char CfgFilePath[])
    // This define can be uncommented to simulate a CAN message on the first
    // Slave present in memory. This is useful to debug and tune the web page
    // on OsX, where the CAN part is not working, since the SocketCAN have not been ported.
-#define SIMULATECANMSG   
+   //#define SIMULATECANMSG   
 #ifdef SIMULATECANMSG
    int FirstID = SlaveGetFirstID();
    if (FirstID)
