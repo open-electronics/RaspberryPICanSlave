@@ -32,7 +32,6 @@
 #endif // __linux__
 
 
-#define CAN_MSG_LEN					8
 
 // CANRx thread callback
 static void* CANRxThreadCbk(void *pPtr)
@@ -49,7 +48,7 @@ static void* CANRxThreadCbk(void *pPtr)
     ifreq        ifr;
     int          sd, ID;
 
-    const char *ifname = "can0"; //"vcan0";
+    const char *ifname = "can0";
 
     memset(&ifr, 0x00, sizeof(ifr));
     memset(&addr, 0x00, sizeof(addr));
@@ -196,7 +195,8 @@ int SendCANMsg(const int CANId, const byte PayLoad[], const int PayLoadSize)
 	int nBytes = write(iSendSocket, &msg, sizeof(msg));
 	
 #ifdef DUMP
-	printf("Number of written bytes: %d\n", nBytes);
+	if (nBytes != sizeof(msg))
+		printf("Error on write\n");
 #endif
 		
 #endif
@@ -205,6 +205,8 @@ int SendCANMsg(const int CANId, const byte PayLoad[], const int PayLoadSize)
 
 int InitCANBus(void)
 {
+	// WARNING: keep the init order STRICLY in that order, i.e. BEFORE the main thread
+	// then the second one. Reversing this will make the main thread socket to fail
 	// Start and init the CANTx socket, running in the main thread
 	if (!InitCANTxMainThread())
 		return false;

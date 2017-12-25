@@ -216,6 +216,8 @@ int SlaveUpdateRelay(int *pCANCTRLId, byte Relays[], const int Id, const int Rel
 					Relays[Relay] = Relays[Relay] ? 0x00 : 0x01;
 					break;
 				}
+				// Update Relays on current slave as well (this is to avoid spurious switch on quick consecutive toggling)
+				it->second.SetRelays(Relays);
 				ret = 0x01;
 			}
 		}
