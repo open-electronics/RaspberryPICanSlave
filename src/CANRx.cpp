@@ -92,9 +92,12 @@ static void* CANRxThreadCbk(void *pPtr)
              {
 				 rxmsg.can_id &= 0x7FFFFFFF;
  #ifdef DUMP
+//#define CANDUMP
+#ifdef CANDUMP
 				 static __int64 LastTS = 0;
                 printf("RCVD CAN_frame: ID = 0x%8x DLC = %d TS = %lld\n", rxmsg.can_id, rxmsg.can_dlc, GetMillis()-LastTS);
 				LastTS = GetMillis();
+#endif
  #endif
                 // Manage the message in Slaves repo
                 ID = rxmsg.can_id;
