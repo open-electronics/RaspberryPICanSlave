@@ -312,14 +312,14 @@ function ParseXML(xmlDoc)
    //Check if the Slaves list is empty
    if (x.length != 0)
    {
-	   var Id, Row, ExpireTS, Relays = [];
+	   var Count, Id, Row, ExpireTS, Relays = [];
 
       // Build/update the MasterTable
-	   for (i = 0; i < x.length; i++)
+	   for (Count = 0; Count < x.length; Count++)
 	   {
-	      Id = x[i].getAttribute('ID');
-		  ExpireTS = x[i].getAttribute('DELTA');
-	      var Children = x[i].getElementsByTagName("R");
+	      Id = x[Count].getAttribute('ID');
+		  ExpireTS = x[Count].getAttribute('DELTA');
+	      var Children = x[Count].getElementsByTagName("R");
 		  for (j=0; j < Children.length; j++)
 			  Relays.push(Number(Children[j].firstChild.data));
 	      // Search if there's an existing matching Id row in the HTML
