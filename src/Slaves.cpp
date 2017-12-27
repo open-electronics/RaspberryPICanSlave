@@ -137,25 +137,33 @@ void Slave_Update_CTRL_ID(const int CTRL_ID, const int ID)
 void Slave_Update_Relays_And_TimeStamp(const byte Relays[], const __int64 TimeStamp, const int ID, const byte bAdd)
 {
    pthread_mutex_lock(&sMutex);
+   
+   bool bIsACTRLID = false;
    // Check the ID is not an existing CTRLID
    for (const auto It : SlavesMap)
    {
 	   if (ID == It.second.GetCTRL_ID())
-		   return;   	
+	   {
+		   bIsACTRLID = true;
+		   break;
+	   }
    }
-   // The Slave repo is not empty so far. Let's find a given ID match
-   auto it = SlavesMap.find(ID);
-   if (it != SlavesMap.end())
+   if(!bIsACTRLID)
    {
-      it->second.SetRelays(Relays);
-      it->second.SetTS(TimeStamp);
-   }
-   else if (bAdd)
-   {
-      CSlaveValue Slave;
-      Slave.SetRelays(Relays);
-      Slave.SetTS(TimeStamp);
-      SlavesMap.emplace(ID, Slave);
+   	 	// The Slave repo is not empty so far. Let's find a given ID match
+   		auto it = SlavesMap.find(ID);
+   	 	if (it != SlavesMap.end())
+   	 	{
+      	  	it->second.SetRelays(Relays);
+      	  	it->second.SetTS(TimeStamp);
+   	 	}
+   	 	else if (bAdd)
+   	 	{	
+      	  	CSlaveValue Slave;
+      	  	Slave.SetRelays(Relays);
+      	  	Slave.SetTS(TimeStamp);
+      	  	SlavesMap.emplace(ID, Slave);
+    	}
    }
    pthread_mutex_unlock(&sMutex);
 }
