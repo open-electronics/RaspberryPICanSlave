@@ -235,11 +235,18 @@ function ManageSlaveEnabling(TTE, Row, Id, NumRelays, Unmapped)
 	else
 	{
  	   // Just restore the first and the last TD, since the relays should have already the correct color
- 	   Row.childNodes[0].style.backgroundColor = "transparent";
+	   if(Unmapped)
+	   {
+   			for (i=0; i<Row.childNodes.length; ++i)
+   				Row.childNodes[i].style.backgroundColor = "LightGrey";
+	   	 	Row.childNodes[0].style.backgroundColor = "Orange";
+   	   }
+	   else
+ 	   		Row.childNodes[0].style.backgroundColor = "transparent";
+	   // Always set the last column as transparent
  	   Row.childNodes[5].style.backgroundColor = "transparent";
 	   // Enable all relay buttons, if not unmapped
-	   if(!Unmapped)
-	   	   DisableRelaysButtons(Id, NumRelays, false);
+	   DisableRelaysButtons(Id, NumRelays, Unmapped);
     }
 }
 
