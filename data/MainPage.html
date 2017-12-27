@@ -315,12 +315,16 @@ function ParseXML(xmlDoc)
    //Check if the Slaves list is empty
    if (x.length != 0)
    {
-	   var Count, Id, Row, ExpireTS, Relays = [];
+	   var Count, Id, Row, ExpireTS, Relays = [], Unmapped;
 
       // Build/update the MasterTable
 	   for (Count = 0; Count < x.length; Count++)
 	   {
 	      Id = x[Count].getAttribute('ID');
+		  // Check this slave is unmapped, i.e. has not any valid CTRL_ID
+		  // This is needed, since we will let the user to see and follow it
+		  // but without letting him press any relay button (i.e. disable them)
+		  Unmapped = x[Count].getAttribute('CTRL_ID') == "";
 		  ExpireTS = x[Count].getAttribute('DELTA');
 	      var Children = x[Count].getElementsByTagName("R");
 		  // Empty the Relays from the previous loop

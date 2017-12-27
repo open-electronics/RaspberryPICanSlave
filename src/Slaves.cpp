@@ -273,11 +273,11 @@ void GetSlavesXMLSnapShot(const char **ppXMLSnapShot)
          XMLSnapShot += " ID=\"";
          XMLSnapShot += IntToHEXStr<int>(it.first);
          XMLSnapShot += "\"";
-	 auto CTRL_ID = it.second.GetCTRL_ID();
+	 	 auto CTRL_ID = it.second.GetCTRL_ID();
          XMLSnapShot += " CTRL_ID=\"";
-	 XMLSnapShot += CTRL_ID != 0 ? IntToHEXStr<int>(it.second.GetCTRL_ID()) : "";
+	 	 XMLSnapShot += CTRL_ID != 0 ? IntToHEXStr<int>(it.second.GetCTRL_ID()) : "";
          XMLSnapShot += "\"";
-	 XMLSnapShot += " DELTA=\"";
+	 	 XMLSnapShot += " DELTA=\"";
 #ifdef VERBOSEDUMP
 #ifdef __linux__
 		 printf("0x%8x %lld %lld %lld\n", it.first, it.second.GetExpireTS(), GetMillis(), it.second.GetTS());
