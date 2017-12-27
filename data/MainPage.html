@@ -180,6 +180,13 @@ function CreateSlave(Row, ID, Relays, TTE, Unmapped)
     Row.appendChild(z);
     var t = document.createTextNode(ID);
     z.appendChild(t);
+	if(Unmapped)
+	{
+ 	    var br = document.createElement("br");
+    	z.appendChild(br);
+    	var t = document.createTextNode("Unmapped");
+    	z.appendChild(t);
+	}
 
     // Create the relays cells
     for (i = 0; i < Relays.length; i++)
