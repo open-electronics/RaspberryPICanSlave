@@ -173,7 +173,7 @@ function UpdateAliveStuff(TTE, Id, ExtTD)
 	}
 }
 
-function CreateSlave(Row, ID, Relays, TTE)
+function CreateSlave(Row, ID, Relays, TTE, Unmapped)
 {
     // Create a cell for the Slave ID
     var z = document.createElement("TD");
@@ -205,7 +205,7 @@ function CreateSlave(Row, ID, Relays, TTE)
    // Update the just created text
     UpdateAliveStuff(TTE, ID, z);
 	
-	ManageSlaveEnabling(TTE, Row, ID, Relays.length);
+	ManageSlaveEnabling(TTE, Row, ID, Relays.length, Unmapped);
 }
 
 function DisableRelaysButtons(SlaveId, NumRelays, bDisable)
@@ -222,7 +222,7 @@ function DisableRelaysButtons(SlaveId, NumRelays, bDisable)
 	}
 }
 
-function ManageSlaveEnabling(TTE, Row, Id, NumRelays)
+function ManageSlaveEnabling(TTE, Row, Id, NumRelays, Unmapped)
 {
 	// Change the TD background when out of date (i.e. TTE < 0)
 	if (TTE < 0)
@@ -237,12 +237,13 @@ function ManageSlaveEnabling(TTE, Row, Id, NumRelays)
  	   // Just restore the first and the last TD, since the relays should have already the correct color
  	   Row.childNodes[0].style.backgroundColor = "transparent";
  	   Row.childNodes[5].style.backgroundColor = "transparent";
-	   // Enable all relay buttons
-	   DisableRelaysButtons(Id, NumRelays, false);
+	   // Enable all relay buttons, if not unmapped
+	   if(!Unmapped)
+	   	   DisableRelaysButtons(Id, NumRelays, false);
     }
 }
 
-function UpdateSlave(table, CANId, Row, Relays, TTE)
+function UpdateSlave(table, CANId, Row, Relays, TTE, Unmapped)
 {
 	//console.log("Update" + CANId + " " + Row + " " + TTE);
    // Gets the children <td> from 1 -> Relays.length and update them text/colors
@@ -251,10 +252,10 @@ function UpdateSlave(table, CANId, Row, Relays, TTE)
    
    UpdateAliveStuff(TTE, CANId, null);
    
-   ManageSlaveEnabling(TTE, Row, CANId, Relays.length);
+   ManageSlaveEnabling(TTE, Row, CANId, Relays.length, Unmapped);
 }
 
-function AppendSlave(table, CANId, Relays, ExpireTS)
+function AppendSlave(table, CANId, Relays, ExpireTS, Unmapped)
 {
 	//table.innerHTML = "";
 
@@ -266,7 +267,7 @@ function AppendSlave(table, CANId, Relays, ExpireTS)
 
    table.appendChild(Row);
 
-   CreateSlave(Row, CANId, Relays, ExpireTS);
+   CreateSlave(Row, CANId, Relays, ExpireTS, Unmapped);
 }
 
 function GetTable()
@@ -334,9 +335,9 @@ function ParseXML(xmlDoc)
 	      // Search if there's an existing matching Id row in the HTML
 	      Row = document.getElementById(Id);
 	      if (Row == null)
-	         AppendSlave(table, Id, Relays, ExpireTS);
+	         AppendSlave(table, Id, Relays, ExpireTS, Unmapped);
 	      else
-	         UpdateSlave(table, Id, Row, Relays, ExpireTS);
+	         UpdateSlave(table, Id, Row, Relays, ExpireTS, Unmapped);
 	   }
    }
 }
