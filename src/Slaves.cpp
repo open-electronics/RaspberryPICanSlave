@@ -275,7 +275,7 @@ void GetSlavesXMLSnapShot(const char **ppXMLSnapShot)
          XMLSnapShot += "\"";
          XMLSnapShot += " CTRL_ID=\"";
 		 auto CTRL_ID = it.second.GetCTRL_ID();
-         XMLSnapShot += CTRL_ID != 0 ? IntToHEXStr<int>() : "";
+         XMLSnapShot += CTRL_ID != 0 ? IntToHEXStr<int>(CTRL_ID) : "";
          XMLSnapShot += "\"";
          XMLSnapShot += " DELTA=\"";
 #ifdef VERBOSEDUMP
