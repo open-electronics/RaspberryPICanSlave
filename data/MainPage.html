@@ -323,6 +323,8 @@ function ParseXML(xmlDoc)
 	      Id = x[Count].getAttribute('ID');
 		  ExpireTS = x[Count].getAttribute('DELTA');
 	      var Children = x[Count].getElementsByTagName("R");
+		  // Empty the Relays from the previous loop
+		  Relays = [];
 		  for (j=0; j < Children.length; j++)
 			  Relays.push(Number(Children[j].firstChild.data));
 	      // Search if there's an existing matching Id row in the HTML
