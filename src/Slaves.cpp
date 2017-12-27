@@ -137,6 +137,12 @@ void Slave_Update_CTRL_ID(const int CTRL_ID, const int ID)
 void Slave_Update_Relays_And_TimeStamp(const byte Relays[], const __int64 TimeStamp, const int ID, const byte bAdd)
 {
    pthread_mutex_lock(&sMutex);
+   // Check the ID is not an existing CTRLID
+   for (const auto It : SlavesMap)
+   {
+	   if (ID == It.second.GetCTRL_ID())
+		   return;   	
+   }
    // The Slave repo is not empty so far. Let's find a given ID match
    auto it = SlavesMap.find(ID);
    if (it != SlavesMap.end())

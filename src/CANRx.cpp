@@ -106,7 +106,7 @@ static void* CANRxThreadCbk(void *pPtr)
                 // bytes in the can_frame (should be) without doing further tests.
                 // The f() updates the msg arrival TimeStamp using the system one.
 				// The last flag means "don't append new CANID to the repo"
-                Slave_Update_Relays_And_TimeStamp(rxmsg.data, GetMillis(), ID, 0x01);
+                Slave_Update_Relays_And_TimeStamp(rxmsg.data, GetMillis(), ID, 0x00);
              }
           }
        }
