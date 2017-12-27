@@ -69,11 +69,11 @@ function UpdateRelay(ExtTD, Value, Id, Idx)
 		TD = ExtTD;
 	else
 	{
-		var Id = "S" + Id + "C" + Idx;
+		var LocId = "S" + Id + "C" + Idx;
 		
-		console.log ("UpdateRelay S" + Id + "C" + Idx);
+		console.log ("UpdateRelay " + LocId);
 		
-		TD = document.getElementById(Id);
+		TD = document.getElementById(LocId);
 	}
 	if (TD != null) 
 	{
