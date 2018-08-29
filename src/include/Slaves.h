@@ -19,7 +19,7 @@
 #define __SLAVES_H__
 
 // Uncomment this to DUMP debug stuff on stdout
-#define DUMP
+//#define DUMP
 // Verbose deeper DUMP
 //#define VERBOSEDUMP
 #ifdef VERBOSEDUMP
